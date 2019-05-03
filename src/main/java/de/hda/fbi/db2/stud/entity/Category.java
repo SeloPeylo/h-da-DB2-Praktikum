@@ -1,5 +1,6 @@
 package de.hda.fbi.db2.stud.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import javax.persistence.Entity;
@@ -10,79 +11,97 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+/**
+ * Category class.
+ *
+ * @author Ruben van Laack
+ */
 @Entity
 //@Table(name = "Category", schema = "base_date_knowledge_test")
 public class Category {
-  // Needed Functions: default constructor, getter & setter, toString, @Entity, @Id
-  // @override equals(...) & hash
+    // Needed Functions: default constructor, getter & setter, toString, @Entity, @Id
+    // @override equals(...) & hash
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private int id;
 
-  private String name;
+    private String name;
 
-  @OneToMany(targetEntity = Question.class, mappedBy = "ofCategory")
-  private List<Question> questions;
+    @OneToMany(targetEntity = Question.class, mappedBy = "category")
+    private List<Question> questions;
 
 
-
-  // Constructor
-  public Category(){
-    //Will stay Empty??
-  }
-
-  // Equals & Hash
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
+    // Constructor
+    public Category() {
+        //Will stay Empty??
     }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
+
+    public Category(String name) {
+        this.name = name;
+        this.questions = new ArrayList<>();
     }
-    Category category = (Category) o;
-    return id == category.id;
-  }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(id);
-  }
+    // Equals & Hash
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Category category = (Category) o;
+        return id == category.id;
+    }
 
-  // To String
-  @Override
-  public String toString() {
-    return "Category{" +
-        "id=" + id +
-        ", name='" + name + '\'' +
-        ", questions=" + questions +
-        '}';
-  }
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 
-  //Getter & Setter
-  public int getId() {
-    return id;
-  }
+    // To String
+    @Override
+    public String toString() {
+        return "Category{" +
+            "id=" + id +
+            ", name='" + name + '\'' +
+            ", questions.size()=" + questions.size() +
+            '}';
+    }
 
-  public void setId(int id) {
-    this.id = id;
-  }
+    //Getter & Setter
+    public int getId() {
+        return id;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public List<Question> getQuestions() {
-    return questions;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public void setQuestions(List<Question> questions) {
-    this.questions = questions;
-  }
+    public List<Question> getQuestions() {
+        return questions;
+    }
+
+    public void setQuestions(List<Question> questions) {
+        this.questions = questions;
+    }
+
+    //other Functions
+    public boolean addQuestion(Question newQuest){
+        if (!questions.contains(newQuest)){
+            questions.add(newQuest);
+            return true;
+        }
+        return false;
+    }
 
 }
