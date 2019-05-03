@@ -1,8 +1,13 @@
 package de.hda.fbi.db2.stud.entity;
 
+import java.util.List;
 import java.util.Objects;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -12,12 +17,19 @@ public class Category {
   // @override equals(...) & hash
 
   @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
   private int id;
+
   private String name;
+
+  @OneToMany(targetEntity = Question.class, mappedBy = "ofCategory")
+  private List<Question> questions;
+
+
 
   // Constructor
   public Category(){
-
+    //Will stay Empty??
   }
 
   // Equals & Hash
@@ -38,6 +50,15 @@ public class Category {
     return Objects.hash(id);
   }
 
+  // To String
+  @Override
+  public String toString() {
+    return "Category{" +
+        "id=" + id +
+        ", name='" + name + '\'' +
+        ", questions=" + questions +
+        '}';
+  }
 
   //Getter & Setter
   public int getId() {
@@ -55,4 +76,13 @@ public class Category {
   public void setName(String name) {
     this.name = name;
   }
+
+  public List<Question> getQuestions() {
+    return questions;
+  }
+
+  public void setQuestions(List<Question> questions) {
+    this.questions = questions;
+  }
+
 }

@@ -3,6 +3,8 @@ package de.hda.fbi.db2.stud.entity;
 import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Question {
@@ -19,7 +21,15 @@ public class Question {
   private String answers4;
   private int correctAnswers;
 
+  @ManyToOne
+  private Category ofCategory;
+
+
+
+
+  // Constructor
   public Question() {
+    //Will stay Empty??
   }
 
   // Equals & Hash
@@ -38,6 +48,21 @@ public class Question {
   @Override
   public int hashCode() {
     return Objects.hash(id);
+  }
+
+  //toString
+  @Override
+  public String toString() {
+    return "Question{" +
+        "id=" + id +
+        ", questionText='" + questionText + '\'' +
+        ", answers1='" + answers1 + '\'' +
+        ", answers2='" + answers2 + '\'' +
+        ", answers3='" + answers3 + '\'' +
+        ", answers4='" + answers4 + '\'' +
+        ", correctAnswers=" + correctAnswers +
+        ", ofCategory=" + ofCategory +
+        '}';
   }
 
   //Getter & Setter
@@ -95,5 +120,13 @@ public class Question {
 
   public void setCorrectAnswers(int correctAnswers) {
     this.correctAnswers = correctAnswers;
+  }
+
+  public Category getOfCategory() {
+    return ofCategory;
+  }
+
+  public void setOfCategory(Category ofCategory) {
+    this.ofCategory = ofCategory;
   }
 }
