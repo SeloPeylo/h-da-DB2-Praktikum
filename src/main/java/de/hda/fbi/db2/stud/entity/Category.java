@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 /**
  * Category class.
@@ -15,7 +16,7 @@ import javax.persistence.OneToMany;
  * @author Ruben van Laack
  */
 @Entity
-//@Table(name = "Category", schema = "base_date_knowledge_test")
+@Table(name = "category", schema = "master_data_knowledge_test")
 public class Category {
     // Needed Functions: default constructor, getter & setter, toString, @Entity, @Id
     // @override equals(...) & hash

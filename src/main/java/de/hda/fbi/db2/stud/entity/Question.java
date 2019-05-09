@@ -4,6 +4,7 @@ import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 /**
  * Question class.
@@ -11,6 +12,7 @@ import javax.persistence.ManyToOne;
  * @author Ruben van Laack
  */
 @Entity
+@Table(name = "question", schema = "master_data_knowledge_test")
 public class Question {
     // Needed Functions:
     // default constructor, getter & setter, toString, @Entity, @Id
