@@ -7,9 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.Table;
 
 /**
  * Category class.
@@ -52,7 +50,7 @@ public class Category {
             return false;
         }
         Category category = (Category) o;
-        return id == category.id;
+        return id == category.getId();
     }
 
     @Override
@@ -64,7 +62,7 @@ public class Category {
     @Override
     public String toString() {
         return "Category{" +
-            "id=" + id +
+            "id=" + id + '\'' +
             ", name='" + name + '\'' +
             ", questions.size()=" + questions.size() +
             '}';

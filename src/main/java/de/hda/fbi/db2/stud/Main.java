@@ -3,6 +3,8 @@ package de.hda.fbi.db2.stud;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import de.hda.fbi.db2.stud.entity.Category;
 import de.hda.fbi.db2.stud.entity.Question;
@@ -25,7 +27,7 @@ public class Main {
      */
     public static void main(String[] args) {
         System.out.println("- Main Start -");
-        List<Category> categories = new ArrayList<>();
+        HashMap<String, Category> categories = new HashMap<>();
 
         try {
             //Read default csv
@@ -44,7 +46,7 @@ public class Main {
 
             // iterate through rows
             System.out.println();
-            System.out.println("Print of questions when creating and adding them: ");
+            System.out.println("Print questions when creating and adding them: ");
             for (String[] rowColumns : defaultCsvLines){
 
                 // Create new Question
@@ -54,19 +56,14 @@ public class Main {
                     rowColumns[2], rowColumns[3],
                     rowColumns[4], rowColumns[5], qCorrectAnswer);
 
-                // Search for Category
+                // Get Category
                 String categoryName = rowColumns[7];
-                Category categoryForCurrentQuestion = null;
-                for (Category currentCat : categories){
-                    if (currentCat.getName().equals(categoryName)){
-                        categoryForCurrentQuestion = currentCat;
-                    }
-                }
+                Category categoryForCurrentQuestion = categories.get(categoryName);
 
-                //Category found or create new
+                // Category does not exist -> create new
                 if (categoryForCurrentQuestion == null){
                     categoryForCurrentQuestion = new Category(categoryName);
-                    categories.add(categoryForCurrentQuestion);
+                    categories.put(categoryName, categoryForCurrentQuestion);
                 }
 
                 // Set Category in for Question
@@ -79,13 +76,15 @@ public class Main {
 
             //Print categories and total count of questions
             System.out.println();
-            System.out.println("Reading done, " + categories.size() + " categories created.");
+            System.out.println("Reading done");
             int countOfQuestions = 0;
-            for (Category cat : categories){
+            for (Category cat : categories.values()){
                 System.out.println(cat.toString());
                 countOfQuestions += cat.getQuestions().size();
             }
-            System.out.println("Total of: " + countOfQuestions + " questions!");
+
+            System.out.println("Total of: " + countOfQuestions + " questions in " +
+                categories.size() + " categories created.");
 
 
 

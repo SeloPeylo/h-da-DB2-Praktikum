@@ -75,7 +75,7 @@ public class Question {
             ", answers3='" + answers3 + '\'' +
             ", answers4='" + answers4 + '\'' +
             ", correctAnswers=" + correctAnswers +
-            ", category=" + category +
+            ", category=" + category.getName() +
             '}';
     }
 
