@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import de.hda.fbi.db2.stud.controller.CategoryController;
 import de.hda.fbi.db2.stud.entity.Category;
 import de.hda.fbi.db2.stud.entity.Question;
 import de.hda.fbi.db2.tools.CsvDataReader;
@@ -27,7 +28,6 @@ public class Main {
      */
     public static void main(String[] args) {
         System.out.println("- Main Start -");
-        HashMap<String, Category> categories = new HashMap<>();
 
         try {
             //Read default csv
@@ -39,52 +39,14 @@ public class Main {
                 final List<String[]> additionalCsvLines = CsvDataReader.read(availableFile);
             }
 
-            // Fill TreeSet with Categories and Questions
-            // Remove first Row:
-            defaultCsvLines.remove(0); // = ?ID, _frage, _antwort_1, _antwort_2, _antwort_3,
-                                            // _antwort_4, _loesung, _kategorie
-
-            // iterate through rows
-            System.out.println();
-            System.out.println("Print questions when creating and adding them: ");
-            for (String[] rowColumns : defaultCsvLines){
-
-                // Create new Question
-                int qId = Integer.parseInt(rowColumns[0]);
-                int qCorrectAnswer = Integer.parseInt(rowColumns[6]);
-                Question newQuestion = new Question(qId , rowColumns[1],
-                    rowColumns[2], rowColumns[3],
-                    rowColumns[4], rowColumns[5], qCorrectAnswer);
-
-                // Get Category
-                String categoryName = rowColumns[7];
-                Category categoryForCurrentQuestion = categories.get(categoryName);
-
-                // Category does not exist -> create new
-                if (categoryForCurrentQuestion == null){
-                    categoryForCurrentQuestion = new Category(categoryName);
-                    categories.put(categoryName, categoryForCurrentQuestion);
-                }
-
-                // Set Category in for Question
-                newQuestion.setCategory(categoryForCurrentQuestion);
-
-                // Print & add Question to Category
-                System.out.println(newQuestion.toString());
-                categoryForCurrentQuestion.addQuestion(newQuestion);
-            }
+            // Create categories & questions
+            CategoryController catCon = new CategoryController();
+            catCon.build(defaultCsvLines);
 
             //Print categories and total count of questions
-            System.out.println();
-            System.out.println("Reading done");
-            int countOfQuestions = 0;
-            for (Category cat : categories.values()){
-                System.out.println(cat.toString());
-                countOfQuestions += cat.getQuestions().size();
-            }
-
-            System.out.println("Total of: " + countOfQuestions + " questions in " +
-                categories.size() + " categories created.");
+            System.out.println(catCon.toString());
+            System.out.println("Total of: " + catCon.getQuestions().size() + " questions in " +
+                catCon.getCategories().size() + " categories created.");
 
 
 
