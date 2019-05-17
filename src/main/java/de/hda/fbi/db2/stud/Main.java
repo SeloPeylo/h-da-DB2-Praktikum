@@ -10,6 +10,9 @@ import de.hda.fbi.db2.stud.controller.CategoryController;
 import de.hda.fbi.db2.stud.entity.Category;
 import de.hda.fbi.db2.stud.entity.Question;
 import de.hda.fbi.db2.tools.CsvDataReader;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 
 /**
  * Main Class.
@@ -20,6 +23,10 @@ import de.hda.fbi.db2.tools.CsvDataReader;
  * @since 0.1.0
  */
 public class Main {
+
+    //DB - Entity Manager
+    private static EntityManagerFactory emf;
+    public static EntityManager em;
 
     /**
      * Main Method and Entry-Point.
@@ -48,6 +55,18 @@ public class Main {
             System.out.println("Total of: " + catCon.getQuestions().size() + " questions in " +
                 catCon.getCategories().size() + " categories created.");
 
+            // Get DB Entitiy Manager
+            emf = Persistence.createEntityManagerFactory("postgresPU");
+            em = emf.createEntityManager();
+
+            // Add Questions & Categories to Persistence
+            for (Category cat : catCon.getCategories()){
+                //em.persist(cat);
+            }
+
+            // commit changes
+            em.getTransaction().commit();
+            em.close();
 
 
         } catch (URISyntaxException use) {
