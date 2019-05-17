@@ -4,8 +4,10 @@ package de.hda.fbi.db2.stud.controller;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import javax.persistence.EntityManager;
 import de.hda.fbi.db2.stud.entity.Category;
 import de.hda.fbi.db2.stud.entity.Question;
+
 
 /**
  * CategoryController class.
@@ -14,6 +16,7 @@ import de.hda.fbi.db2.stud.entity.Question;
  */
 public class CategoryController {
     private HashMap<String, Category> categories;
+    //private EntityManager em;
 
     public CategoryController(){
         categories = new HashMap<>();
@@ -23,7 +26,7 @@ public class CategoryController {
         this.categories = categories;
     }
 
-    public void build(List<String[]> csvLines){
+    public void build(List<String[]> csvLines, EntityManager entityManager){
 
         //Start with empty list
         categories.clear();
@@ -41,13 +44,28 @@ public class CategoryController {
             Question newQuestion = new Question(qId , rowColumns[1], rowColumns[2], rowColumns[3],
                 rowColumns[4], rowColumns[5], qCorrectAnswer);
 
+            if (entityManager != null){
+                // Persist Question
+                entityManager.persist(newQuestion);
+            }
+
             // Get Category
             String categoryName = rowColumns[7];
             Category categoryForCurrentQuestion = categories.get(categoryName);
 
             // Category does not exist -> create new
             if (categoryForCurrentQuestion == null){
+                // Create new Category
                 categoryForCurrentQuestion = new Category(categoryName);
+
+
+                if (entityManager != null) {
+                    // Persist new Category
+                    entityManager.persist(categoryForCurrentQuestion);
+                }
+
+
+                // Add new Category to list / HashMap
                 categories.put(categoryName, categoryForCurrentQuestion);
             }
 

@@ -6,13 +6,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import de.hda.fbi.db2.stud.controller.CategoryController;
 import de.hda.fbi.db2.stud.entity.Category;
 import de.hda.fbi.db2.stud.entity.Question;
 import de.hda.fbi.db2.tools.CsvDataReader;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
+
 
 /**
  * Main Class.
@@ -26,7 +27,7 @@ public class Main {
 
     //DB - Entity Manager
     private static EntityManagerFactory emf;
-    public static EntityManager em;
+    private static EntityManager em;
 
     /**
      * Main Method and Entry-Point.
@@ -37,6 +38,10 @@ public class Main {
         System.out.println("- Main Start -");
 
         try {
+            // Get DB Entitiy Manager
+            emf = Persistence.createEntityManagerFactory("postgresPU");
+            em = emf.createEntityManager();
+
             //Read default csv
             final List<String[]> defaultCsvLines = CsvDataReader.read();
 
@@ -46,25 +51,19 @@ public class Main {
                 final List<String[]> additionalCsvLines = CsvDataReader.read(availableFile);
             }
 
-            // Create categories & questions
+            // Start Database transaction
+            em.getTransaction().begin();
+
+            // Create categories & questions and add to persis
             CategoryController catCon = new CategoryController();
-            catCon.build(defaultCsvLines);
+            catCon.build(defaultCsvLines, em);
 
             //Print categories and total count of questions
             System.out.println(catCon.toString());
             System.out.println("Total of: " + catCon.getQuestions().size() + " questions in " +
                 catCon.getCategories().size() + " categories created.");
 
-            // Get DB Entitiy Manager
-            emf = Persistence.createEntityManagerFactory("postgresPU");
-            em = emf.createEntityManager();
-
-            // Add Questions & Categories to Persistence
-            for (Category cat : catCon.getCategories()){
-                //em.persist(cat);
-            }
-
-            // commit changes
+            // commit changes & close
             em.getTransaction().commit();
             em.close();
 

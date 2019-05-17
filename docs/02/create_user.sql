@@ -1,0 +1,13 @@
+-- User: postgres
+-- DROP USER postgres;
+
+CREATE USER JpaUser WITH
+  LOGIN
+  NOSUPERUSER
+  NOCREATEROLE
+  INHERIT
+  CREATEDB
+  REPLICATION
+  CONNECTION LIMIT -1
+  PASSWORD 'JpaPassword'
+  ;
