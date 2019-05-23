@@ -1,9 +1,11 @@
 package de.hda.fbi.db2.stud.entity;
 
+import java.util.List;
 import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -29,6 +31,9 @@ public class Question {
 
     @ManyToOne
     private Category category;
+
+    @OneToMany(targetEntity = QuestionAsked.class, mappedBy = "question")
+    private List<QuestionAsked> asked;
 
 
     // Constructor
