@@ -44,10 +44,8 @@ public class CategoryController {
             Question newQuestion = new Question(qId , rowColumns[1], rowColumns[2], rowColumns[3],
                 rowColumns[4], rowColumns[5], qCorrectAnswer);
 
-            if (entityManager != null){
-                // Persist Question
-                entityManager.persist(newQuestion);
-            }
+            // Persist Question
+            entityManager.persist(newQuestion);
 
             // Get Category
             String categoryName = rowColumns[7];
@@ -58,12 +56,8 @@ public class CategoryController {
                 // Create new Category
                 categoryForCurrentQuestion = new Category(categoryName);
 
-
-                if (entityManager != null) {
-                    // Persist new Category
-                    entityManager.persist(categoryForCurrentQuestion);
-                }
-
+                // Persist new Category
+                entityManager.persist(categoryForCurrentQuestion);
 
                 // Add new Category to list / HashMap
                 categories.put(categoryName, categoryForCurrentQuestion);

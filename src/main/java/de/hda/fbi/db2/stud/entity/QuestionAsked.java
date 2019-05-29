@@ -14,7 +14,8 @@ import javax.persistence.Table;
  * @author Ruben van Laack
  */
 @Entity
-@Table(name = "questionasked", schema = "master_data_knowledge_test")
+@Table(name = "questionasked")
+//@Table(name = "questionasked", schema = "master_data_knowledge_test")
 public class QuestionAsked {
 
     // Vars

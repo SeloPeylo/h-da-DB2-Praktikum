@@ -17,7 +17,8 @@ import javax.persistence.Table;
  * @author Ruben van Laack
  */
 @Entity
-@Table(name = "category", schema = "master_data_knowledge_test")
+@Table(name = "category")
+//@Table(name = "category", schema = "master_data_knowledge_test")
 public class Category {
     // Needed Functions: default constructor, getter & setter, toString, @Entity, @Id
     // @override equals(...) & hash

@@ -17,12 +17,13 @@ import javax.persistence.Table;
  * @author Ruben van Laack
  */
 @Entity
-@Table(name = "game", schema = "master_data_knowledge_test")
+@Table(name = "game")
+//@Table(name = "game", schema = "master_data_knowledge_test")
 public class Game {
 
     // Vars
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int id;
 
     private Date start;

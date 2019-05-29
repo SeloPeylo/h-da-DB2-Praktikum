@@ -16,26 +16,26 @@ import javax.persistence.Table;
  * @author Ruben van Laack
  */
 @Entity
-@Table(name = "player", schema = "master_data_knowledge_test")
+@Table(name = "player")
+//@Table(name = "player", schema = "master_data_knowledge_test")
 public class Player {
 
     // Vars
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int id;
 
     @Column(unique = true)
     private String name;
 
-    // default constructor
-    public Player() {
-
-    }
-
     @OneToMany(targetEntity = Game.class, mappedBy = "player")
     private List<Game> games;
 
 
+    // default constructor
+    public Player() {
+
+    }
 
     // Equals & Hash
     @Override

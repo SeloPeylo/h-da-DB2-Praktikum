@@ -8,7 +8,10 @@
 
         <!-- put your entity-classes here -->
         <class>de.hda.fbi.db2.stud.entity.Category</class>
+        <class>de.hda.fbi.db2.stud.entity.Game</class>
+        <class>de.hda.fbi.db2.stud.entity.Player</class>
         <class>de.hda.fbi.db2.stud.entity.Question</class>
+        <class>de.hda.fbi.db2.stud.entity.QuestionAsked</class>
 
         <!-- this must be provided -->
         <properties>
@@ -33,7 +36,10 @@
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
         <!-- put your entity-classes here -->
         <class>de.hda.fbi.db2.stud.entity.Category</class>
+        <class>de.hda.fbi.db2.stud.entity.Game</class>
+        <class>de.hda.fbi.db2.stud.entity.Player</class>
         <class>de.hda.fbi.db2.stud.entity.Question</class>
+        <class>de.hda.fbi.db2.stud.entity.QuestionAsked</class>
 
         <!-- this must be provided -->
         <properties>
@@ -58,7 +64,10 @@
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
         <!-- put your entity-classes here -->
         <class>de.hda.fbi.db2.stud.entity.Category</class>
+        <class>de.hda.fbi.db2.stud.entity.Game</class>
+        <class>de.hda.fbi.db2.stud.entity.Player</class>
         <class>de.hda.fbi.db2.stud.entity.Question</class>
+        <class>de.hda.fbi.db2.stud.entity.QuestionAsked</class>
 
         <!-- this must be provided -->
         <properties>

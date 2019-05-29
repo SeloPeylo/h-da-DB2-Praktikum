@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import de.hda.fbi.db2.stud.controller.CategoryController;
 import de.hda.fbi.db2.stud.entity.Category;
@@ -51,21 +52,38 @@ public class Main {
                 final List<String[]> additionalCsvLines = CsvDataReader.read(availableFile);
             }
 
-            // Start Database transaction
-            em.getTransaction().begin();
+            EntityTransaction transaction = null;
+            CategoryController catCon = null;
+            try {
+                // Start Database transaction
+                transaction = em.getTransaction();
+                transaction.begin();
 
-            // Create categories & questions and add to persis
-            CategoryController catCon = new CategoryController();
-            catCon.build(defaultCsvLines, em);
+                // Create categories & questions and add to persis
+                catCon = new CategoryController();
+                catCon.build(defaultCsvLines, em);
+
+                // commit changes
+                transaction.commit();
+
+            } catch (RuntimeException e){
+                // Rollback changes
+                if (transaction != null && transaction.isActive()){
+                    transaction.rollback();
+                }
+
+            } finally {
+                // Close Entity Manager & Factory
+                em.close();
+                emf.close();
+            }
 
             //Print categories and total count of questions
-            System.out.println(catCon.toString());
-            System.out.println("Total of: " + catCon.getQuestions().size() + " questions in " +
-                catCon.getCategories().size() + " categories created.");
-
-            // commit changes & close
-            em.getTransaction().commit();
-            em.close();
+            if (catCon != null){
+                System.out.println(catCon.toString());
+                System.out.println("Total of: " + catCon.getQuestions().size() + " questions in " +
+                    catCon.getCategories().size() + " categories created.");
+            }
 
 
         } catch (URISyntaxException use) {
