@@ -14,8 +14,8 @@ import javax.persistence.Table;
  * @author Ruben van Laack
  */
 @Entity
-@Table(name = "question")
-//@Table(name = "question", schema = "master_data_knowledge_test")
+//@Table(name = "question")
+@Table(name = "question", schema = "master_data_knowledge_test")
 public class Question {
     // Needed Functions:
     // default constructor, getter & setter, toString, @Entity, @Id

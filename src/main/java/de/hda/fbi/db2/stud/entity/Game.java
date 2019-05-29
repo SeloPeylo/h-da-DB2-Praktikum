@@ -17,8 +17,8 @@ import javax.persistence.Table;
  * @author Ruben van Laack
  */
 @Entity
-@Table(name = "game")
-//@Table(name = "game", schema = "master_data_knowledge_test")
+//@Table(name = "game")
+@Table(name = "game", schema = "master_data_knowledge_test")
 public class Game {
 
     // Vars
@@ -26,8 +26,8 @@ public class Game {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int id;
 
-    private Date start;
-    private Date end;
+    private Date startDatetime;
+    private Date endDatetime;
     private int maxQuestions;
 
     @ManyToOne
@@ -35,7 +35,6 @@ public class Game {
 
     @OneToMany(targetEntity = QuestionAsked.class, mappedBy = "game")
     private List<QuestionAsked> askesQuestions;
-
 
 
     // default constructor
@@ -66,8 +65,8 @@ public class Game {
     public String toString() {
         return "Game{" +
             "id=" + id +
-            ", start=" + start +
-            ", end=" + end +
+            ", startDatetime=" + startDatetime +
+            ", endDatetime=" + endDatetime +
             ", maxQuestions=" + maxQuestions +
             '}';
     }
@@ -81,22 +80,22 @@ public class Game {
         this.id = id;
     }
 
-    public Date getStart() {
-        return (new Date(this.start.getTime()));
+    public Date getStartDatetime() {
+        return (new Date(this.startDatetime.getTime()));
     }
 
-    public void setStart(Date start) {
+    public void setStartDatetime(Date start) {
         Date copy = new Date(start.getTime());
-        this.start = copy;
+        this.startDatetime = copy;
     }
 
-    public Date getEnd() {
-        return (new Date(this.end.getTime()));
+    public Date getEndDatetime() {
+        return (new Date(this.endDatetime.getTime()));
     }
 
-    public void setEnd(Date end) {
+    public void setEndDatetime(Date end) {
         Date copy = new Date(end.getTime());
-        this.end = copy;
+        this.endDatetime = copy;
     }
 
     public int getMaxQuestions() {
@@ -106,4 +105,7 @@ public class Game {
     public void setMaxQuestions(int maxQuestions) {
         this.maxQuestions = maxQuestions;
     }
+
+
 }
+
