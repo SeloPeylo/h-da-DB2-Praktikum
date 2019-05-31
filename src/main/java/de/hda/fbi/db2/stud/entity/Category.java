@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -24,7 +25,8 @@ public class Category {
     // @override equals(...) & hash
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    //@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "master_data_knowledge_test.id_cat")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int id;
 
     @Column(unique = true)
@@ -32,6 +34,9 @@ public class Category {
 
     @OneToMany(targetEntity = Question.class, mappedBy = "category")
     private List<Question> questions;
+
+    @ManyToMany(targetEntity = Game.class, mappedBy = "categories")
+    private List<Game> games;
 
 
     // Constructor
@@ -77,9 +82,11 @@ public class Category {
         return id;
     }
 
+    /* Value auto generated, should never be set
     public void setId(int id) {
         this.id = id;
     }
+     */
 
     public String getName() {
         return name;
@@ -95,6 +102,14 @@ public class Category {
 
     public void setQuestions(List<Question> questions) {
         this.questions = questions;
+    }
+
+    public List<Game> getGames() {
+        return games;
+    }
+
+    public void setGames(List<Game> games) {
+        this.games = games;
     }
 
     //other Functions

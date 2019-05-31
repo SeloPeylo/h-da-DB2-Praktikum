@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -35,6 +36,9 @@ public class Game {
 
     @OneToMany(targetEntity = QuestionAsked.class, mappedBy = "game")
     private List<QuestionAsked> askesQuestions;
+
+    @ManyToMany(targetEntity = Category.class, mappedBy = "games")
+    private List<Category> categories;
 
 
     // default constructor
@@ -72,9 +76,11 @@ public class Game {
     }
 
     // Getter & Setter
+    /* Value auto generated, should never be set
     public int getId() {
         return id;
     }
+    */
 
     public void setId(int id) {
         this.id = id;
@@ -106,6 +112,28 @@ public class Game {
         this.maxQuestions = maxQuestions;
     }
 
+    public Player getPlayer() {
+        return player;
+    }
 
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
+    public List<QuestionAsked> getAskesQuestions() {
+        return askesQuestions;
+    }
+
+    public void setAskesQuestions(List<QuestionAsked> askesQuestions) {
+        this.askesQuestions = askesQuestions;
+    }
+
+    public List<Category> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(List<Category> categories) {
+        this.categories = categories;
+    }
 }
 

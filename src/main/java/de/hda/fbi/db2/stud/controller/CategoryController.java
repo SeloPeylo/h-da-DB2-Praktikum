@@ -3,6 +3,7 @@ package de.hda.fbi.db2.stud.controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import javax.persistence.EntityManager;
 import de.hda.fbi.db2.stud.entity.Category;
@@ -16,7 +17,6 @@ import de.hda.fbi.db2.stud.entity.Question;
  */
 public class CategoryController {
     private HashMap<String, Category> categories;
-    //private EntityManager em;
 
     public CategoryController(){
         categories = new HashMap<>();
@@ -68,6 +68,24 @@ public class CategoryController {
 
             // Print & add Question to Category
             categoryForCurrentQuestion.addQuestion(newQuestion);
+        }
+    }
+
+    public void load(EntityManager entityManager){
+        // Empty current list
+        categories.clear();
+
+        // Load all categories & questions from DB
+        List resultL = entityManager.createQuery("select c from Category c order by c.name asc").getResultList();
+
+        // Go through results
+        for (Iterator i = resultL.iterator(); i.hasNext();) {
+
+            // Get Category
+            Category cat = (Category) i.next();
+
+            // Add Category to hashmap
+            categories.put(cat.getName(), cat);
         }
     }
 

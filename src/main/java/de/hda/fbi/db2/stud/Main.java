@@ -1,5 +1,7 @@
 package de.hda.fbi.db2.stud;
 
+import de.hda.fbi.db2.stud.controller.GameController;
+import java.io.Console;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -36,61 +38,100 @@ public class Main {
      * @param args Command-Line Arguments.
      */
     public static void main(String[] args) {
+
+        // Create EMF
+        emf = Persistence.createEntityManagerFactory("postgresPU");
+
         System.out.println("- Main Start -");
 
-        try {
-            // Get DB Entitiy Manager
-            emf = Persistence.createEntityManagerFactory("postgresPU");
-            em = emf.createEntityManager();
+        // Menu Options
+        System.out.println("0) Stammdaten aus csv-Datei laden");
+        System.out.println("1) Wissenstest spielen");
+        System.out.println("2) Analyse der Spieldaten");
+        System.out.println("--------------------------------");
+        System.out.print("Ihre Wahl: ");
+        //String enterValue = System.console().readLine();
+        int chosenOption = 2; //Integer.parseInt(enterValue);
 
-            //Read default csv
-            final List<String[]> defaultCsvLines = CsvDataReader.read();
+        switch (chosenOption){
+            case 0: // Read file & create master data
+                try {
+                    // Get DB Entitiy Manager
+                    em = emf.createEntityManager();
 
-            //Read (if available) additional csv-files and default csv-file
-            List<String> availableFiles = CsvDataReader.getAvailableFiles();
-            for (String availableFile : availableFiles) {
-                final List<String[]> additionalCsvLines = CsvDataReader.read(availableFile);
-            }
+                    //Read default csv
+                    final List<String[]> defaultCsvLines = CsvDataReader.read();
 
-            EntityTransaction transaction = null;
-            CategoryController catCon = null;
-            try {
-                // Start Database transaction
-                transaction = em.getTransaction();
-                transaction.begin();
+                    //Read (if available) additional csv-files and default csv-file
+                    List<String> availableFiles = CsvDataReader.getAvailableFiles();
+                    for (String availableFile : availableFiles) {
+                        final List<String[]> additionalCsvLines = CsvDataReader.read(availableFile);
+                    }
 
-                // Create categories & questions and add to persis
-                catCon = new CategoryController();
-                catCon.build(defaultCsvLines, em);
+                    // TODO: Delete old master data??
 
-                // commit changes
-                transaction.commit();
+                    // Create Entities ?
+                    EntityTransaction transaction = null;
+                    CategoryController catCon = null;
+                    try {
+                        // Start Database transaction
+                        transaction = em.getTransaction();
+                        transaction.begin();
 
-            } catch (RuntimeException e){
-                // Rollback changes
-                if (transaction != null && transaction.isActive()){
-                    transaction.rollback();
+                        // Create categories & questions and add to persis
+                        catCon = new CategoryController();
+                        catCon.build(defaultCsvLines, em);
+
+                        // commit changes
+                        transaction.commit();
+
+                    } catch (RuntimeException e){
+                        // Rollback changes
+                        if (transaction != null && transaction.isActive()){
+                            transaction.rollback();
+                        }
+
+                    } finally {
+                        // Close Entity Manager
+                        em.close();
+                    }
+
+                    //Print categories and total count of questions
+                    if (catCon != null){
+                        System.out.println(catCon.toString());
+                        System.out.println("Total of: " + catCon.getQuestions().size() + " questions in " +
+                            catCon.getCategories().size() + " categories created.");
+                    }
+
+                } catch (URISyntaxException use) {
+                    System.out.println(use);
+                } catch (IOException ioe) {
+                    System.out.println(ioe);
                 }
+                break;
 
-            } finally {
-                // Close Entity Manager & Factory
-                em.close();
-                emf.close();
-            }
+            case 1: // Play Game
+                // Create game play view and start
+                GameController gameController = new GameController(emf);
+                Gameplay gp = new Gameplay(gameController);
+                gp.start();
+                break;
 
-            //Print categories and total count of questions
-            if (catCon != null){
+            case 2: // Test
+                em = emf.createEntityManager();
+                CategoryController catCon = new CategoryController();
+                catCon.load(em);
+
                 System.out.println(catCon.toString());
                 System.out.println("Total of: " + catCon.getQuestions().size() + " questions in " +
                     catCon.getCategories().size() + " categories created.");
-            }
 
 
-        } catch (URISyntaxException use) {
-            System.out.println(use);
-        } catch (IOException ioe) {
-            System.out.println(ioe);
+                break;
         }
+
+        // Close EMF
+        emf.close();
     }
 
     public String getGreeting() {

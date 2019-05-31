@@ -66,9 +66,11 @@ public class Player {
     }
 
     // Getter & Setter
+    /* Value auto generated, should never be set
     public int getId() {
         return id;
     }
+     */
 
     public void setId(int id) {
         this.id = id;
@@ -80,5 +82,13 @@ public class Player {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public List<Game> getGames() {
+        return games;
+    }
+
+    public void setGames(List<Game> games) {
+        this.games = games;
     }
 }

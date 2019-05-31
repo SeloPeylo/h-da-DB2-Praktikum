@@ -20,7 +20,7 @@ public class QuestionAsked {
 
     // Vars
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int id;
     private int selectedAnswer;
     //private boolean correct;
@@ -66,9 +66,11 @@ public class QuestionAsked {
     }
 
     // Getter & Setter
+    /* Value auto generated, should never be set
     public int getId() {
         return id;
     }
+     */
 
     public void setId(int id) {
         this.id = id;
