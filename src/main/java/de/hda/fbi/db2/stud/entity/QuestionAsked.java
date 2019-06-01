@@ -57,20 +57,22 @@ public class QuestionAsked {
     }
 
     // To String
+
     @Override
     public String toString() {
         return "QuestionAsked{" +
             "id=" + id +
             ", selectedAnswer=" + selectedAnswer +
+            ", game=" + game +
+            ", question=" + question +
             '}';
     }
 
     // Getter & Setter
-    /* Value auto generated, should never be set
+
     public int getId() {
         return id;
     }
-     */
 
     public void setId(int id) {
         this.id = id;
@@ -82,5 +84,21 @@ public class QuestionAsked {
 
     public void setSelectedAnswer(int selectedAnswer) {
         this.selectedAnswer = selectedAnswer;
+    }
+
+    public Game getGame() {
+        return game;
+    }
+
+    public void setGame(Game game) {
+        this.game = game;
+    }
+
+    public Question getQuestion() {
+        return question;
+    }
+
+    public void setQuestion(Question question) {
+        this.question = question;
     }
 }

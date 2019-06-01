@@ -1,5 +1,6 @@
 package de.hda.fbi.db2.stud.entity;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -43,7 +44,12 @@ public class Game {
 
     // default constructor
     public Game() {
-        //Will stay Empty??
+        this.startDatetime = null;
+        this.endDatetime = null;
+        maxQuestions = 0;
+        player = null;
+        askesQuestions = new ArrayList<>();
+        categories = new ArrayList<>();
     }
 
     // Equals & Hash
@@ -65,6 +71,7 @@ public class Game {
     }
 
     // toString
+
     @Override
     public String toString() {
         return "Game{" +
@@ -72,15 +79,16 @@ public class Game {
             ", startDatetime=" + startDatetime +
             ", endDatetime=" + endDatetime +
             ", maxQuestions=" + maxQuestions +
+            ", player.getId()=" + player.getId() +
+            ", askesQuestions.size()=" + askesQuestions.size() +
+            ", categories=" + categories +
             '}';
     }
 
     // Getter & Setter
-    /* Value auto generated, should never be set
     public int getId() {
         return id;
     }
-    */
 
     public void setId(int id) {
         this.id = id;

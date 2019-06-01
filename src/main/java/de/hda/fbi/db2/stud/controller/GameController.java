@@ -1,14 +1,20 @@
 package de.hda.fbi.db2.stud.controller;
 
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
 import de.hda.fbi.db2.stud.entity.Category;
 import de.hda.fbi.db2.stud.entity.Game;
 import de.hda.fbi.db2.stud.entity.Player;
-import java.util.HashMap;
-import java.util.List;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
+import de.hda.fbi.db2.stud.entity.Question;
+import de.hda.fbi.db2.stud.entity.QuestionAsked;
 
 /**
  * GameController class.
@@ -31,8 +37,8 @@ public class GameController {
 
 
     // Queries
-    public HashMap<String, Category> getCategories() {
-        try{
+    public HashMap<String, Category> getAllCategories() {
+        try {
             // Get list of categories
             catCon.load(entityManager);
             HashMap<String, Category> categories = catCon.getHashSet();
@@ -44,7 +50,7 @@ public class GameController {
     }
 
     public Player getPlayer(String name){
-        try{
+        try {
             // Get player
             String query = ("select p from Player p where p.name = :name");
             Player player = (Player) entityManager.createQuery(query)
@@ -53,6 +59,7 @@ public class GameController {
 
         } catch (NoResultException e){
             return null;
+            // no error, player just does not exist
         }
     }
 
@@ -60,7 +67,7 @@ public class GameController {
         EntityTransaction transaction = null;
         Player newPlayer = null;
 
-        try{
+        try {
             // Start Database transaction
             transaction = entityManager.getTransaction();
             transaction.begin();
@@ -84,25 +91,29 @@ public class GameController {
             }
 
             newPlayer = null;
+
+            throw new Error("Could not create new player.");
         }
 
         return newPlayer;
     }
 
-    public Game createGame(Player player, List<Category> gameCategories){
+    public Game createGame(Player player, List<Category> gameCategories,
+        int maxQuestions, Date startDate){
+
         EntityTransaction transaction = null;
         Game game = null;
 
-        try{
+        try {
             // Start Database transaction
             transaction = entityManager.getTransaction();
             transaction.begin();
 
             // Create new game
             game = new Game();
-
-            // add to persist
             entityManager.persist(game);
+            game.setMaxQuestions(maxQuestions);
+            game.setStartDatetime(startDate);
 
             // set & persist player
             entityManager.persist(player);
@@ -110,7 +121,7 @@ public class GameController {
             game.setPlayer(player);
 
             // persist and add gameCategories
-            for(Category cat : gameCategories){
+            for (Category cat : gameCategories){
                 entityManager.persist(cat);
                 cat.getGames().add(game);
             }
@@ -127,11 +138,117 @@ public class GameController {
 
             // in case it was already created
             game = null;
+
+            throw new Error("Could not create new game.");
         }
 
         return game;
     }
 
+    public void setGameEndDate(Game game, Date endDate){
+        EntityTransaction transaction = null;
+
+        try {
+            // Start Database transaction
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            // persist & change
+            entityManager.persist(game);
+            game.setEndDatetime(endDate);
+
+            // commit changes
+            transaction.commit();
+
+        } catch (RuntimeException e){
+            // Rollback changes
+            if (transaction != null && transaction.isActive()){
+                transaction.rollback();
+            }
+
+            throw new Error("Could not change game end date");
+        }
+    }
+
+    public boolean addQuestionAnswer(Game game, Question question, int chosenAnswer){
+        EntityTransaction transaction = null;
+        boolean answerCorrect = false;
+
+        try {
+            // Start Database transaction
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            // -- modify database here --
+
+            // create & add to persist
+            QuestionAsked newQuestAnwer = new QuestionAsked();
+            entityManager.persist(newQuestAnwer);
+
+            // modify
+            newQuestAnwer.setSelectedAnswer(chosenAnswer);
+
+            // - add question / bidirectional
+            entityManager.persist(question);
+            newQuestAnwer.setQuestion(question);
+            question.getAsked().add(newQuestAnwer);
+
+            // - add game / bidirectional
+            entityManager.persist(game);
+            newQuestAnwer.setGame(game);
+            game.getAskesQuestions().add(newQuestAnwer);
+
+            // get return value
+            answerCorrect = (question.getCorrectAnswer() == chosenAnswer);
+            // -- end modify --
+
+            // commit changes
+            transaction.commit();
+
+        } catch (RuntimeException e){
+            // Rollback changes
+            if (transaction != null && transaction.isActive()){
+                transaction.rollback();
+            }
+
+            throw new Error("Could not store question answer");
+        }
+
+        return answerCorrect;
+    }
+
+    // non database methods
+    public static Question getRandomQuestion(Game game){
+        // get HashSet of used questions
+        HashSet<Integer> usedQuestionIds = new HashSet<>();
+        for (QuestionAsked qs : game.getAskesQuestions()){
+            usedQuestionIds.add(qs.getQuestion().getId());
+        }
+
+        // get list of all unused questions
+        ArrayList<Question> unusedQuestions = new ArrayList<>();
+        for (Category cat : game.getCategories()){
+            for (Question que : cat.getQuestions()){
+
+                // question not used
+                if (!usedQuestionIds.contains(que.getId())){
+                    unusedQuestions.add(que);
+                }
+            }
+        }
+
+        // -- Math.random() = rand ∈ (rand >= 0 && rand < 1)
+        // -- (rand * size) = randIndex ∈(randIndex >= 0 && randIndex < size)
+
+        if (unusedQuestions.size() > 0){
+            int randomQuestionIndex = (int) (Math.random() * unusedQuestions.size());
+            Question randomQuestion = unusedQuestions.get(randomQuestionIndex);
+
+            return randomQuestion;
+        } else {
+            return null;
+        }
+    }
 
 
 }

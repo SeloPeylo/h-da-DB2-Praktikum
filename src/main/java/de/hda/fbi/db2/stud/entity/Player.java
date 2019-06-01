@@ -1,5 +1,6 @@
 package de.hda.fbi.db2.stud.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import javax.persistence.Column;
@@ -34,7 +35,7 @@ public class Player {
 
     // default constructor
     public Player() {
-
+        games = new ArrayList<>();
     }
 
     // Equals & Hash
@@ -56,21 +57,19 @@ public class Player {
     }
 
     // To String
-
     @Override
     public String toString() {
         return "Player{" +
             "id=" + id +
             ", name='" + name + '\'' +
+            ", games.size()=" + games.size() +
             '}';
     }
 
     // Getter & Setter
-    /* Value auto generated, should never be set
     public int getId() {
         return id;
     }
-     */
 
     public void setId(int id) {
         this.id = id;

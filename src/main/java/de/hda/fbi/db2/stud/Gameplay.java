@@ -1,15 +1,15 @@
 package de.hda.fbi.db2.stud;
 
-import de.hda.fbi.db2.stud.controller.CategoryController;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Scanner;
 import de.hda.fbi.db2.stud.controller.GameController;
 import de.hda.fbi.db2.stud.entity.Category;
 import de.hda.fbi.db2.stud.entity.Game;
 import de.hda.fbi.db2.stud.entity.Player;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
+import de.hda.fbi.db2.stud.entity.Question;
+
 
 /**
  * Gameplay class.
@@ -25,35 +25,58 @@ public class Gameplay {
     }
 
     public void start(){
+        // get start date
+        Date gameStartDate = new Date();
+
+        System.out.println(" - Start des Spiels -");
+
         // create new game
-        Game game = createNewGame();
+        Game game = createNewGame(gameStartDate);
 
         // start game play
-        playGame();
+        int[] score = playGame(game);
+
+        // get end date
+        Date gameEndDate = new Date();
+        gameCon.setGameEndDate(game, gameEndDate);
+
+        // End of Game
+        System.out.println("Ergebnis: " + score[0] + " von " + score[1] + " Antworten richtig.");
     }
 
-    private Game createNewGame(){
-
+    private Game createNewGame(Date gameStartDate){
+        Scanner inputScanner = new Scanner(System.in, "utf-8");
 
         // Ask for player name
-        System.out.print("Spielername: ");
-        String playerName = System.console().readLine().replace(" ", "");
+        System.out.println("Spielername: ");
+        //System.out.flush(); // show pring before starting input
+        String playerName = inputScanner.nextLine().replace(" ", "");
         System.out.println();
 
-        // Show possible categories
-        System.out.print("Alle bekannten Kategorien: ");
-        System.out.print("-----------------------------");
-        HashMap<String, Category> categories = gameCon.getCategories();
-        for (Category cat : categories.values()){
-            System.out.print(cat.getName());
+        // Get or create player
+        Player player = gameCon.getPlayer(playerName);
+        if (player == null){
+            player = gameCon.createPlayer(playerName);
+            System.out.println("Neuer Spieler erstellt: " + player.toString());
+        } else {
+            System.out.println("Spieler gefunden: " + player.toString());
         }
-        System.out.print("-----------------------------");
+
+        // Show possible categories
+        System.out.println("");
+        System.out.println("Alle bekannten Kategorien: ");
+        System.out.println("-----------------------------");
+        HashMap<String, Category> categories = gameCon.getAllCategories();
+        for (Category cat : categories.values()){
+            System.out.println(cat.getName());
+        }
+        System.out.println("-----------------------------");
 
 
         // Ask for game categories
-        System.out.print("Kategorien? (z.B. \"Wintersport, TV\": ");
-        String[] chosenCategories = System.console().readLine().split(", ");
-        List<Category> gameCategories = new ArrayList<>();
+        System.out.println("Kategorien? (z.B. \"Wintersport, TV\": ");
+        String[] chosenCategories = inputScanner.nextLine().split(", ");
+        ArrayList<Category> gameCategories = new ArrayList<>();
         for (String chosenCatName : chosenCategories){
             Category gameCategory = categories.get(chosenCatName);
 
@@ -61,29 +84,88 @@ public class Gameplay {
                 gameCategories.add(gameCategory);
             }
         }
-        System.out.println();
+        System.out.println(); // line break
 
         // Ask for max questions for this game
-        System.out.print("Maximale Anzahl an Fragen: ");
-        String maxQuestCountText = System.console().readLine();
-        int maxQuestCount = Integer.parseInt(maxQuestCountText);
+        System.out.println("Maximale Anzahl an Fragen: ");
+        int maxQuestCount = inputScanner.nextInt();
         System.out.println();
 
-        // Get or create player
-        Player player = gameCon.getPlayer(playerName);
-        if (player == null){
-            player = gameCon.createPlayer(playerName);
-        }
-
         // Create new Game
-        Game game = gameCon.createGame(player, gameCategories);
+        Game game = gameCon.createGame(player, gameCategories, maxQuestCount, gameStartDate);
+
+        // print game
+        System.out.println("Spiel erstellt: " + game.toString());
 
         // return game
         return game;
     }
 
-    private void playGame(){
+    private int[] playGame(Game game){
+        Scanner inputScanner = new Scanner(System.in, "utf-8");
 
+        // while game not done
+        int correctAnswerdQuestions = 0;
+        int questCount = 0;
+        for (; questCount < game.getMaxQuestions(); ++questCount){
+
+            // get next question
+            Question nextQuestion = GameController.getRandomQuestion(game);
+
+            if (nextQuestion == null){
+                System.out.println("Keine neuen Fragen mehr vorhanden.");
+                break;
+            }
+
+            // print questions
+            System.out.println();
+            System.out.println("Question " + questCount + ": " + nextQuestion.getQuestionText());
+            System.out.println("--- Antworten ---");
+            System.out.println("1) " + nextQuestion.getAnswers1());
+            System.out.println("2) " + nextQuestion.getAnswers2());
+            System.out.println("3) " + nextQuestion.getAnswers3());
+            System.out.println("4) " + nextQuestion.getAnswers4());
+
+            // get answer
+            // --while syntax wrong
+            String chosenAnswerText;
+            do {
+                System.out.println("Ihre Antwort (1 | 2 | 3 | 4): ");
+                chosenAnswerText = inputScanner.nextLine();
+            } while (// too long or wrong char
+                chosenAnswerText.length() > 1 ||
+                    !(
+                        chosenAnswerText.contains("1") || chosenAnswerText.contains("2") ||
+                            chosenAnswerText.contains("3") || chosenAnswerText.contains("4")
+                    )
+            );
+            int chosenAnswer = Integer.parseInt(chosenAnswerText);
+            System.out.println(); // line break
+
+            // validate answer & store
+            boolean answerCorrect = gameCon.addQuestionAnswer(game, nextQuestion, chosenAnswer);
+
+            // print question evaluation
+            if (answerCorrect) {
+                System.out.println("=> Richtige Antwort!");
+                ++correctAnswerdQuestions;
+            } else {
+                System.out.println("=> Falsche Antwort!");
+            }
+
+            // stop game
+            System.out.println("Spiel beenden (Ja/Nein): ");
+            String stopGame = inputScanner.nextLine().replace(" ", "");
+            if (stopGame.equals("Ja") || stopGame.equals("J") || stopGame.equals("j")
+                || stopGame.equals("JA")){
+                break;
+            }
+        }
+
+        // End of Gameplay / return score
+        System.out.println("Spiel beendet");
+        int[] score = {correctAnswerdQuestions, questCount};
+        return score;
     }
 
 

@@ -25,7 +25,8 @@ public class Category {
     // @override equals(...) & hash
 
     @Id
-    //@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "master_data_knowledge_test.id_cat")
+    //@GeneratedValue(strategy = GenerationType.SEQUENCE,
+    // - generator = "master_data_knowledge_test.id_cat")
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int id;
 
@@ -35,13 +36,14 @@ public class Category {
     @OneToMany(targetEntity = Question.class, mappedBy = "category")
     private List<Question> questions;
 
-    @ManyToMany(targetEntity = Game.class, mappedBy = "categories")
+    @ManyToMany
     private List<Game> games;
 
 
     // Constructor
     public Category() {
-        //Will stay Empty??
+        questions = new ArrayList<>();
+        games = new ArrayList<>();
     }
 
     public Category(String name) {
@@ -73,7 +75,8 @@ public class Category {
         return "Category{" +
             "id=" + id + '\'' +
             ", name='" + name + '\'' +
-            ", questions.size()=" + questions.size() +
+            ", questions.size()=" + questions.size() + '\'' +
+            ", games.size()=" + games.size() +
             '}';
     }
 
@@ -82,11 +85,9 @@ public class Category {
         return id;
     }
 
-    /* Value auto generated, should never be set
     public void setId(int id) {
         this.id = id;
     }
-     */
 
     public String getName() {
         return name;

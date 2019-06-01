@@ -1,5 +1,6 @@
 package de.hda.fbi.db2.stud.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import javax.persistence.Entity;
@@ -28,7 +29,7 @@ public class Question {
     private String answers2;
     private String answers3;
     private String answers4;
-    private int correctAnswers;
+    private int correctAnswer;
 
     @ManyToOne
     private Category category;
@@ -39,7 +40,7 @@ public class Question {
 
     // Constructor
     public Question() {
-        //Will stay Empty??
+        asked = new ArrayList<>();
     }
 
     public Question(int id, String questionText, String answers1, String answers2, String answers3,
@@ -51,7 +52,7 @@ public class Question {
         this.answers2 = answers2;
         this.answers3 = answers3;
         this.answers4 = answers4;
-        this.correctAnswers = correctAnswers;
+        this.correctAnswer = correctAnswers;
     }
 
     // Equals & Hash
@@ -82,8 +83,9 @@ public class Question {
             ", answers2='" + answers2 + '\'' +
             ", answers3='" + answers3 + '\'' +
             ", answers4='" + answers4 + '\'' +
-            ", correctAnswers=" + correctAnswers +
-            ", category=" + category.getName() +
+            ", correctAnswer=" + correctAnswer +
+            ", category=" + category +
+            ", asked.size()=" + asked.size() +
             '}';
     }
 
@@ -136,12 +138,12 @@ public class Question {
         this.answers4 = answers4;
     }
 
-    public int getCorrectAnswers() {
-        return correctAnswers;
+    public int getCorrectAnswer() {
+        return correctAnswer;
     }
 
-    public void setCorrectAnswers(int correctAnswers) {
-        this.correctAnswers = correctAnswers;
+    public void setCorrectAnswer(int correctAnswers) {
+        this.correctAnswer = correctAnswers;
     }
 
     public Category getCategory() {
@@ -150,5 +152,13 @@ public class Question {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public List<QuestionAsked> getAsked() {
+        return asked;
+    }
+
+    public void setAsked(List<QuestionAsked> asked) {
+        this.asked = asked;
     }
 }

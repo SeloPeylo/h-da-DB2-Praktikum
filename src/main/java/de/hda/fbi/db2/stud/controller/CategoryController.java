@@ -76,7 +76,8 @@ public class CategoryController {
         categories.clear();
 
         // Load all categories & questions from DB
-        List resultL = entityManager.createQuery("select c from Category c order by c.name asc").getResultList();
+        List resultL = entityManager.
+            createQuery("select c from Category c order by c.name asc").getResultList();
 
         // Go through results
         for (Iterator i = resultL.iterator(); i.hasNext();) {
