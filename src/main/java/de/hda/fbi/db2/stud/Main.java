@@ -48,6 +48,17 @@ public class Main {
 
         System.out.println("- Main Start -");
 
+        // Check if all master data tables exist in db
+        Mastadata md = new Mastadata(emf);
+        boolean tablesExist = md.checkMasterdataTables();
+        if (!tablesExist){
+            System.out.println("Die Stammdatentabellen wurden nicht gefunden "
+                + "und werden daher neu erzeugt.");
+            System.out.println("Es wird empfohlen Menupunk 0 (Stammdaten aus csv-Datei laden) "
+                + "zu wählen, um die Tabellen mit den benötigten Initialwerten zu füllen.");
+            md.createMasterdataTables();
+        }
+
 
         // Menu Options
         System.out.println("0) Stammdaten aus csv-Datei laden");
@@ -58,18 +69,24 @@ public class Main {
         int chosenOption = inputScanner.nextInt();  // read int
         System.out.println(); // line break
 
+
         switch (chosenOption){
             case 0: // Read file & create master data
-                Mastadata md = new Mastadata(emf);
                 md.clearDB();
                 boolean error = !md.readToDB();
                 if (error){
                     System.out.println("Fehler beim Einlesen & Speichern der Stammdaten!");
                 }
-                md.close();
+
                 break;
 
             case 1: // Play Game
+                // check if gameplay tables exist
+                if (!md.checkGameplayTables()){
+                    // tables dont exist, so create them
+                    md.createGameplayTables();
+                }
+
                 // Create game play view and start
                 GameController gameController = new GameController(emf);
                 Gameplay gp = new Gameplay(gameController);
@@ -82,6 +99,7 @@ public class Main {
         }
 
         // Close EMF
+        md.close();
         emf.close();
     }
 

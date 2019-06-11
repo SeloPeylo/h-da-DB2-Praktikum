@@ -1,5 +1,6 @@
 package de.hda.fbi.db2.stud;
 
+import de.hda.fbi.db2.stud.entity.Player;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -8,6 +9,8 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import de.hda.fbi.db2.stud.controller.CategoryController;
 import de.hda.fbi.db2.tools.CsvDataReader;
+import javax.persistence.NoResultException;
+import javax.persistence.Query;
 
 
 /**
@@ -133,6 +136,58 @@ public class Mastadata {
         }
 
         return successful;
+    }
+
+    public boolean checkGameplayTables(){
+        boolean tablesExist = false;
+
+        // check Game & Player & QuestionAsked
+        if ( tableExists("Game") && tableExists("Player") &&
+            tableExists("QuestionAsked")){
+            // all tables exist
+            return true;
+
+        } else {
+            // one or more tables dont exist
+            return false;
+        }
+    }
+
+    public boolean checkMasterdataTables(){
+        // check Category & Question
+        if ( tableExists("Catgegory") && tableExists("Question")){
+            // all tables exist
+            return true;
+
+        } else {
+            // one or more tables dont exist
+            return false;
+        }
+    }
+
+    public void createGameplayTables(){
+
+    }
+
+    public void createMasterdataTables(){
+
+    }
+
+    // private methods
+    private boolean tableExists(String tablename){
+        try {
+            // create query for table
+            String sql = ("select t from " + tablename + " t where ");
+            Query query = entityManager.createQuery(sql);
+            query.setFirstResult(0);
+            query.setMaxResults(1);
+            Object result = query.getSingleResult();
+
+            return true;
+
+        } catch (NoResultException e){
+            return false;
+        }
     }
 
 }
