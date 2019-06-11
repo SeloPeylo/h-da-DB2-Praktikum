@@ -1,16 +1,16 @@
 package de.hda.fbi.db2.stud;
 
-import de.hda.fbi.db2.stud.entity.Player;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceException;
+import javax.persistence.Query;
 import de.hda.fbi.db2.stud.controller.CategoryController;
 import de.hda.fbi.db2.tools.CsvDataReader;
-import javax.persistence.NoResultException;
-import javax.persistence.Query;
 
 
 /**
@@ -30,7 +30,7 @@ public class Mastadata {
         entityManager.close();
     }
 
-    public void clearDB(){
+    public void clearMasterdata(){
         EntityTransaction transaction = null;
         String deleteQuery = null;
 
@@ -40,7 +40,38 @@ public class Mastadata {
             transaction.begin();
 
             // - Delete table contents -
+            // delete questions
+            String questionsDeleteQuery = ("delete from Question q");
+            entityManager.createQuery(questionsDeleteQuery).executeUpdate();
 
+            // delete categories
+            String controllerDeleteQuery = ("delete from Category c");
+            entityManager.createQuery(controllerDeleteQuery).executeUpdate();
+            // --
+
+            // commit changes
+            transaction.commit();
+
+        } catch (RuntimeException e){
+            // Rollback changes
+            if (transaction != null && transaction.isActive()){
+                transaction.rollback();
+            }
+
+            throw new Error("Could not delete table contents.");
+        }
+    }
+
+    public void clearGamedata(){
+        EntityTransaction transaction = null;
+        String deleteQuery = null;
+
+        try {
+            // Start Database transaction
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            // - Delete table contents -
             // delete question_asked
             deleteQuery = ("delete from QuestionAsked");
             entityManager.createQuery(deleteQuery).executeUpdate();
@@ -53,14 +84,6 @@ public class Mastadata {
             // delete game
             deleteQuery = ("delete from Player");
             entityManager.createQuery(deleteQuery).executeUpdate();
-
-            // delete questions
-            String questionsDeleteQuery = ("delete from Question q");
-            entityManager.createQuery(questionsDeleteQuery).executeUpdate();
-
-            // delete categories
-            String controllerDeleteQuery = ("delete from Category c");
-            entityManager.createQuery(controllerDeleteQuery).executeUpdate();
             // --
 
             // commit changes
@@ -139,11 +162,24 @@ public class Mastadata {
     }
 
     public boolean checkGameplayTables(){
-        boolean tablesExist = false;
+        boolean game = tableExists("select c from Game c");
+        boolean player = tableExists("select c from Player c");
+        boolean questA = tableExists("select c from QuestionAsked c");
+
+        if (!game){
+            System.out.println("Tabelle 'Game' exisitiert nicht!");
+        }
+
+        if (!player){
+            System.out.println("Tabelle 'Player' exisitiert nicht!");
+        }
+
+        if (!questA){
+            System.out.println("Tabelle 'QuestionAsked' exisitiert nicht!");
+        }
 
         // check Game & Player & QuestionAsked
-        if ( tableExists("Game") && tableExists("Player") &&
-            tableExists("QuestionAsked")){
+        if (game && player && questA){
             // all tables exist
             return true;
 
@@ -155,7 +191,18 @@ public class Mastadata {
 
     public boolean checkMasterdataTables(){
         // check Category & Question
-        if ( tableExists("Catgegory") && tableExists("Question")){
+        boolean cat = tableExists("select c from Category c");
+        boolean quest = tableExists("select t from Question t");
+
+        if (!cat){
+            System.out.println("Tabelle 'Category' exisitiert nicht!");
+        }
+
+        if (!quest){
+            System.out.println("Tabelle 'Question' exisitiert nicht!");
+        }
+
+        if (cat && quest){
             // all tables exist
             return true;
 
@@ -165,6 +212,7 @@ public class Mastadata {
         }
     }
 
+    /*
     public void createGameplayTables(){
 
     }
@@ -172,22 +220,35 @@ public class Mastadata {
     public void createMasterdataTables(){
 
     }
+    */
 
     // private methods
-    private boolean tableExists(String tablename){
+    private boolean tableExists(String sql){
         try {
             // create query for table
-            String sql = ("select t from " + tablename + " t where ");
+            //String sql = ("select t from " + table + " t");
             Query query = entityManager.createQuery(sql);
             query.setFirstResult(0);
             query.setMaxResults(1);
-            Object result = query.getSingleResult();
+
+            // test query - try to access table
+            // Object obj = query.getSingleResult();
+            query.getSingleResult();
+
+            //System.out.println("Tabelle '" + table.name() + "' exisitiert nicht!");
 
             return true;
 
         } catch (NoResultException e){
+            // table exists, but no entries
+            return true;
+
+        } catch (PersistenceException e){
+            // Table does not exist
+            //System.out.println("Error: " + e.toString());
             return false;
         }
+
     }
 
 }

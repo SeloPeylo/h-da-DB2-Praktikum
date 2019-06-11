@@ -1,22 +1,9 @@
 package de.hda.fbi.db2.stud;
 
-import java.io.Console;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Scanner;
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
-import de.hda.fbi.db2.stud.controller.CategoryController;
 import de.hda.fbi.db2.stud.controller.GameController;
-import de.hda.fbi.db2.stud.entity.Category;
-import de.hda.fbi.db2.stud.entity.Question;
-import de.hda.fbi.db2.tools.CsvDataReader;
 
 
 
@@ -47,16 +34,30 @@ public class Main {
         Scanner inputScanner = new Scanner(System.in, "utf-8");
 
         System.out.println("- Main Start -");
+        Mastadata md = new Mastadata(emf);
 
         // Check if all master data tables exist in db
-        Mastadata md = new Mastadata(emf);
-        boolean tablesExist = md.checkMasterdataTables();
+        boolean tablesExist = true;
+        if (!md.checkMasterdataTables()){
+            System.err.println("Die Stammdatentabellen wurden nicht gefunden!");
+            System.err.println("Bitte erstellen sie die Tabellen und "
+                + "starten sie das Programm erneut.");
+
+            tablesExist = false;
+
+        }
+
+        // check if gameplay tables exist
+        if (!md.checkGameplayTables()){
+            System.err.println("Die Spieldatentabellen wurden nicht gefunden!");
+            System.err.println("Bitte erstellen sie die Tabellen und "
+                + "starten sie das Programm erneut.");
+
+            tablesExist = false;
+        }
+
         if (!tablesExist){
-            System.out.println("Die Stammdatentabellen wurden nicht gefunden "
-                + "und werden daher neu erzeugt.");
-            System.out.println("Es wird empfohlen Menupunk 0 (Stammdaten aus csv-Datei laden) "
-                + "zu wählen, um die Tabellen mit den benötigten Initialwerten zu füllen.");
-            md.createMasterdataTables();
+            System.exit(0);
         }
 
 
@@ -72,7 +73,15 @@ public class Main {
 
         switch (chosenOption){
             case 0: // Read file & create master data
-                md.clearDB();
+                // clear master data
+                System.out.println("Stammdaten löschen ...");
+                md.clearMasterdata();
+
+                // clear gamedata if it exists
+                System.out.println("Spieldaten löschen ...");
+                md.clearGamedata();
+
+                System.out.println("Lesen der csv-Datei ...");
                 boolean error = !md.readToDB();
                 if (error){
                     System.out.println("Fehler beim Einlesen & Speichern der Stammdaten!");
@@ -81,12 +90,6 @@ public class Main {
                 break;
 
             case 1: // Play Game
-                // check if gameplay tables exist
-                if (!md.checkGameplayTables()){
-                    // tables dont exist, so create them
-                    md.createGameplayTables();
-                }
-
                 // Create game play view and start
                 GameController gameController = new GameController(emf);
                 Gameplay gp = new Gameplay(gameController);
