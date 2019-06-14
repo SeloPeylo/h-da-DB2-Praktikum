@@ -8,10 +8,13 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 /**
  * Game class.
@@ -25,7 +28,7 @@ public class Game {
 
     // Vars
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     private Date startDatetime;
@@ -38,7 +41,13 @@ public class Game {
     @OneToMany(targetEntity = QuestionAsked.class, mappedBy = "game")
     private List<QuestionAsked> askesQuestions;
 
-    @ManyToMany(targetEntity = Category.class, mappedBy = "games")
+    //@ManyToMany(targetEntity = Category.class, mappedBy = "games")
+    @ManyToMany
+    @JoinTable(
+        name = "master_data_knowledge_test.game_category",
+        joinColumns = @JoinColumn(name = "gameId", referencedColumnName = "id"),
+        inverseJoinColumns = @JoinColumn(name = "categoryId", referencedColumnName = "id"),
+        uniqueConstraints = @UniqueConstraint(columnNames = {"gameId", "categoryId"}))
     private List<Category> categories;
 
 

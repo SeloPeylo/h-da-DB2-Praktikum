@@ -154,7 +154,7 @@ public class Gameplay {
             }
 
             // stop game
-            System.out.println("Spiel beenden (Ja/Nein): ");
+            System.out.println("Spiel beenden (j/nein oder <Enter>): ");
             String stopGame = inputScanner.nextLine().replace(" ", "");
             if (stopGame.equals("Ja") || stopGame.equals("J") || stopGame.equals("j")
                 || stopGame.equals("JA")){
