@@ -20,6 +20,7 @@ public class GameSimulator {
     private void genPlayer(){
         // random name of new player = count
 
+        //
     }
 
     private void genGame(Player player){
