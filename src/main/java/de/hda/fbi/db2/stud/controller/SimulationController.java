@@ -1,28 +1,39 @@
 package de.hda.fbi.db2.stud.controller;
 
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+
 import de.hda.fbi.db2.stud.entity.Category;
 import de.hda.fbi.db2.stud.entity.Game;
 import de.hda.fbi.db2.stud.entity.Player;
 import de.hda.fbi.db2.stud.entity.Question;
 import de.hda.fbi.db2.stud.entity.QuestionAsked;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
 
+
+
+/**
+ * SimulationController class.
+ *
+ * @author Ruben van Laack
+ */
 public class SimulationController {
     private EntityManager entityManager;
     private CategoryController categoryController;
     private int countPlayer;
     private int countGamesEach;
     private int commitAfter;
-    private final int commitSize = 100;
 
 
-    public SimulationController(int countPlayer, int countGamesEach, int commitAfter, EntityManagerFactory emf) {
+    public SimulationController(int countPlayer, int countGamesEach,
+        int commitAfter, EntityManagerFactory emf) {
+
         this.countPlayer = countPlayer;
         this.countGamesEach = countGamesEach;
         this.entityManager = emf.createEntityManager();
@@ -52,7 +63,7 @@ public class SimulationController {
         }
     }
 
-    private void runGroup(int playerCount, int gamesCount,List<Category> allCategories){
+    private void runGroup(int playerCount, int gamesCount, List<Category> allCategories){
         EntityTransaction transaction = null;
 
         try {
@@ -68,7 +79,7 @@ public class SimulationController {
                 entityManager.persist(player);
 
                 // set name
-                player.setName("player"+new Date().getTime());
+                player.setName("player" + new Date().getTime());
 
                 // play games
                 for (int j = 0; j < gamesCount; ++j){
@@ -95,6 +106,7 @@ public class SimulationController {
     }
 
     private void genGame(Player player, List<Category> allCategories) {
+        Random random = new Random();
         // create game
         Game game = new Game();
 
@@ -106,14 +118,19 @@ public class SimulationController {
         player.getGames().add(game);
 
         // count questions = 1 - 10
-        int questCount = (int) (Math.random() * 10)+1;
+        //int questCount = (int) (Math.random() * 10) + 1;
+        int questCount = random.nextInt(10) + 1;  // 1 - 10
         game.setMaxQuestions(questCount);
 
-        // choose Categories count? 2-5?
-        int categoriesCount = (int) (Math.random() * 4)+2;
+        // choose how may categories (random) 2-5
+        //int categoriesCount = (int) (Math.random() * 4) + 2;
+        int categoriesCount = random.nextInt(4) + 2;  // 2 - 5
         List<Category> gameCategories = new ArrayList<>();
+
+        // get random categories
         for (int i = 0; i < categoriesCount; ++i) {
-            int randomQuestionIndex = (int) (Math.random() * allCategories.size());
+            //int randomQuestionIndex = (int) (Math.random() * allCategories.size());
+            int randomQuestionIndex = random.nextInt(allCategories.size()); // 0 - size
             Category selectedCategory = allCategories.get(randomQuestionIndex);
 
             // is this category already selected for this game?
@@ -127,50 +144,61 @@ public class SimulationController {
         game.setCategories(gameCategories);
 
         // get start date Doday+(Random * 100days)
-        int daysToAdd = (int) (Math.random() * 100); // 0 - 99
+        //int daysToAdd = (int) (Math.random() * 100); // 0 - 99
+        int daysToAdd = random.nextInt(100); // 0 - 99
         Date gameStartDate = new Date();
-        gameStartDate = addToDate(gameStartDate, daysToAdd, 0,0,0);
+        gameStartDate = addToDate(gameStartDate, daysToAdd, 0, 0, 0);
         game.setStartDatetime(gameStartDate);
 
         // play game
-        simulateGameplay(game);
+        simulateGameplay(game, random);
 
         // add end date =  start date + x
         Date endDate = new Date();
-        endDate = addToDate(endDate, daysToAdd, 0,0,0);
+        endDate = addToDate(endDate, daysToAdd, 0, 0, 0);
 
         game.setEndDatetime(endDate);
     }
 
-    private void simulateGameplay(Game game) {
+    private void simulateGameplay(Game game, Random random) {
         Question currentQuestion = null;
         int questCount = 0;
         int correctAnwers = 0;
 
         do {
-            //
+            try {
+                // get questions / make guess / count right answers
+                currentQuestion = GameController.getRandomQuestion(game);
+
+            } catch (Exception e) {
+                currentQuestion = null;
+            }
 
 
-            // get questions / make guess / count right answers
-            currentQuestion = GameController.getRandomQuestion(game);
             if (currentQuestion == null) {
                 // no more questions for the chosen categories
                 break;
             }
 
-            int selectedAnswer = (int) (Math.random() * 4) + 1; // 1 - 4
+            //int selectedAnswer = (int) (Math.random() * 4) + 1; // 1 - 4
+            int selectedAnswer = random.nextInt(4) + 1;  // 1 - 4
 
-            boolean correct = addQuestionAnswer(game, currentQuestion, selectedAnswer, entityManager);
+            boolean correct = addQuestionAnswer(game, currentQuestion,
+                selectedAnswer, entityManager);
 
             // save count of right answers in game
-            if (correct) ++correctAnwers;
-            // TODO save count in game
+            if (correct) {
+                ++correctAnwers;
+            }
+            // TODO(ruben): save count in game
 
             ++questCount;
-        } while (questCount < game.getMaxQuestions() && currentQuestion != null);
+        } while (questCount < game.getMaxQuestions());
     }
 
-    public static boolean addQuestionAnswer(Game game, Question question, int chosenAnswer, EntityManager entityManager){
+    public static boolean addQuestionAnswer(Game game, Question question,
+        int chosenAnswer, EntityManager entityManager){
+
         // get return value
         boolean answerCorrect = (question.getCorrectAnswer() == chosenAnswer);
 
@@ -196,14 +224,24 @@ public class SimulationController {
         return answerCorrect;
     }
 
-    public static Date addToDate(Date date, int days, int hours, int minutes, int seconds)
-    {
+    public static Date addToDate(Date date, int days, int hours, int minutes, int seconds) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
-        if (days != 0) cal.add(Calendar.DATE, days);
-        if (hours != 0) cal.add(Calendar.HOUR, hours);
-        if (minutes != 0) cal.add(Calendar.MINUTE, minutes);
-        if (seconds != 0) cal.add(Calendar.SECOND, seconds);
+        if (days != 0) {
+            cal.add(Calendar.DATE, days);
+        }
+
+        if (hours != 0) {
+            cal.add(Calendar.HOUR, hours);
+        }
+
+        if (minutes != 0) {
+            cal.add(Calendar.MINUTE, minutes);
+        }
+
+        if (seconds != 0) {
+            cal.add(Calendar.SECOND, seconds);
+        }
 
         return cal.getTime();
     }

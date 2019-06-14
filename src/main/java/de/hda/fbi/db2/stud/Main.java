@@ -1,12 +1,12 @@
 package de.hda.fbi.db2.stud;
 
-import de.hda.fbi.db2.stud.controller.SimulationController;
+
 import java.util.Date;
 import java.util.Scanner;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import de.hda.fbi.db2.stud.controller.GameController;
-
+import de.hda.fbi.db2.stud.controller.SimulationController;
 
 
 
@@ -82,6 +82,9 @@ public class Main {
 
 
             switch (chosenOption){
+                default:
+                    System.out.println("Default");
+                    break;
                 case 0: // Read file & create master data
                     // clear master data
                     System.out.println("Stammdaten löschen ...");
@@ -113,7 +116,8 @@ public class Main {
 
                 case 3: // Run Simulation
                     // Nach 20 Spielern = 2.000 Spielen wird commited
-                    SimulationController sc = new SimulationController(100, 5, 1, emf);
+                    SimulationController sc =
+                        new SimulationController(100, 5, 1, emf);
 
                     // print info
                     Date startDate = new Date();
@@ -127,17 +131,19 @@ public class Main {
                     // print info
                     Date endDate = new Date();
                     System.out.println("Simulation abgeschlossen.");
-                    System.out.println("Endzeit: " + endDate.toString() + " (Start war: " + startDate.toString()+ ")");
+                    System.out.println("Endzeit: " + endDate.toString()
+                        + " (Start war: " + startDate.toString() + ")");
                     long runtime = (endDate.getTime() - startDate.getTime());
                     System.out.println("Differenz: " + runtime);
-                    long runtime_minutes = runtime / 60000; // 1s = 1000ms;
-                    System.out.println("Differenz in Minuten: " + runtime_minutes);
+                    long runtimeMinutes = runtime / 60000; // 1s = 1000ms;
+                    System.out.println("Differenz in Minuten: " + runtimeMinutes);
 
                     sc.close();
                     break;
                 case 4: // End Programm
                     System.out.println("Programm wird gestoppt.");
                     break;
+
             }
         } while (chosenOption != 4);
 

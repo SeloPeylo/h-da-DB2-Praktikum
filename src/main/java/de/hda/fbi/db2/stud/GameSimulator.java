@@ -1,17 +1,25 @@
 package de.hda.fbi.db2.stud;
 
-import de.hda.fbi.db2.stud.entity.Game;
-import de.hda.fbi.db2.stud.entity.Player;
+
+import java.util.Random;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import de.hda.fbi.db2.stud.entity.Game;
+import de.hda.fbi.db2.stud.entity.Player;
 
+/**
+ * GameSimulator Class.
+ *
+ * @author Ruben van Laack
+ * @author ##
+ */
 public class GameSimulator {
 
     private EntityManager entityManager;
     private int countPlayer;
     private int countGamesEach;
-    private final int commitSize = 100;
+    private static final int commitSize = 100;
 
 
     public GameSimulator(int countPlayer, int countGamesEach, EntityManagerFactory emf) {
@@ -40,10 +48,10 @@ public class GameSimulator {
                 entityManager.persist(player);
 
                 // set name
-                player.setName("player"+i);
+                player.setName("player" + i);
 
                 // play games
-                for (int j = 0; j < countGamesEach; ++i){
+                for (int j = 0; j < countGamesEach; ++j){
                     genGame(player);
                 }
 
@@ -64,6 +72,7 @@ public class GameSimulator {
     }
 
     private void genGame(Player player) {
+        Random random = new Random();
         // create game
         Game game = new Game();
 
@@ -71,7 +80,8 @@ public class GameSimulator {
         entityManager.persist(game);
 
         // count questions = 1 - 10
-        int questCount = (int) (Math.random() * 10)+1;
+        //int questCount = (int) (Math.random() * 10) + 1;
+        int questCount = random.nextInt(10) + 1;
         game.setMaxQuestions(questCount);
 
         // choose Categories count? 2-5?
