@@ -180,26 +180,8 @@ public class GameController {
             transaction.begin();
 
             // -- modify database here --
+            answerCorrect = SimulationController.addQuestionAnswer(game, question, chosenAnswer, entityManager);
 
-            // create & add to persist
-            QuestionAsked newQuestAnwer = new QuestionAsked();
-            entityManager.persist(newQuestAnwer);
-
-            // modify
-            newQuestAnwer.setSelectedAnswer(chosenAnswer);
-
-            // - add question / bidirectional
-            entityManager.persist(question);
-            newQuestAnwer.setQuestion(question);
-            question.getAsked().add(newQuestAnwer);
-
-            // - add game / bidirectional
-            entityManager.persist(game);
-            newQuestAnwer.setGame(game);
-            game.getAskesQuestions().add(newQuestAnwer);
-
-            // get return value
-            answerCorrect = (question.getCorrectAnswer() == chosenAnswer);
             // -- end modify --
 
             // commit changes
