@@ -20,7 +20,7 @@ public class QuestionAsked {
 
     // Vars
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private int selectedAnswer;
     //private boolean correct;

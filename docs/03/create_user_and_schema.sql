@@ -1,6 +1,8 @@
--- DROP USER postgres;
+-- DROP SCHEMA master_data_knowledge_test ;
 
-CREATE USER JpaUser WITH
+-- DROP USER jpauser;
+
+CREATE USER jpauser WITH
   LOGIN
   NOSUPERUSER
   NOCREATEROLE
@@ -10,8 +12,6 @@ CREATE USER JpaUser WITH
   CONNECTION LIMIT -1
   PASSWORD 'JpaPassword'
   ;
-
--- DROP SCHEMA master_data_knowledge_test ;
 
 CREATE SCHEMA master_data_knowledge_test
     AUTHORIZATION jpauser;

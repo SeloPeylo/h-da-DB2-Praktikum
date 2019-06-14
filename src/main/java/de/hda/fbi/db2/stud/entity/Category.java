@@ -27,7 +27,7 @@ public class Category {
     @Id
     //@GeneratedValue(strategy = GenerationType.SEQUENCE,
     // - generator = "master_data_knowledge_test.id_cat")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column(unique = true)
@@ -36,7 +36,7 @@ public class Category {
     @OneToMany(targetEntity = Question.class, mappedBy = "category")
     private List<Question> questions;
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "categories")
     private List<Game> games;
 
 
