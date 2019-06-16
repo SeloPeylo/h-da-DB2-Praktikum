@@ -1,5 +1,13 @@
 package de.hda.fbi.db2.stud;
 
+import de.hda.fbi.db2.stud.controller.AnalysisController;
+import de.hda.fbi.db2.stud.entity.Player;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import java.util.Scanner;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -98,6 +106,23 @@ public class Main {
                 break;
 
             case 2: // Analyze Game data
+                AnalysisController anCon = new AnalysisController(emf);
+                // TODO(ruben): build menu
+                // TODO(ruben): test all queries with a big dataset
+
+                // get players in date
+                Date startdate = fromString("2019-06-16 16:55:03");
+                Date enddate = fromString("2019-06-16 16:55:23");
+                List<Player> players = anCon.playedBetween(startdate, enddate);
+
+                System.out.println("Ausgabe aller Spieler welche zwischen: " +
+                    startdate.toString() +
+                    " und " + enddate.toString() + " ein Spiel gespielt haben.");
+                for (Player p : players) {
+                    System.out.println(p.toString());
+                }
+
+                anCon.close();
                 break;
         }
 
@@ -108,5 +133,19 @@ public class Main {
 
     public String getGreeting() {
         return "app should have a greeting";
+    }
+
+    public static Date fromString(String dateString){ // Format: 2019-06-16 16:55:03
+        Date date = null;
+        try{
+
+            DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.GERMANY);
+            date = format.parse(dateString);
+
+        } catch (ParseException e){
+            e.printStackTrace();
+        }
+
+        return date;
     }
 }
