@@ -115,9 +115,10 @@ public class Main {
                     break;
 
                 case 3: // Run Simulation
-                    // Nach 20 Spielern = 2.000 Spielen wird commited
+                    // Practice 3: 10.000 Player, 100 Games each
+                    // After 20 Player (= 2.000 Games) will be commited
                     SimulationController sc =
-                        new SimulationController(100, 5, 1, emf);
+                        new SimulationController(10000, 100, 10000, emf);
 
                     // print info
                     Date startDate = new Date();

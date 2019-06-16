@@ -65,9 +65,11 @@ public class SimulationController {
 
     private void runGroup(int playerCount, int gamesCount, List<Category> allCategories){
         EntityTransaction transaction = null;
+        Long groupName = new Date().getTime();
 
         try {
             // Start Database transaction
+            System.out.println("Neue Transaktion (" + playerCount + ") Spieler)");
             transaction = entityManager.getTransaction();
             transaction.begin();
 
@@ -79,7 +81,7 @@ public class SimulationController {
                 entityManager.persist(player);
 
                 // set name
-                player.setName("player" + new Date().getTime());
+                player.setName("player" + groupName + "_" + i);
 
                 // play games
                 for (int j = 0; j < gamesCount; ++j){
@@ -166,14 +168,8 @@ public class SimulationController {
         int correctAnwers = 0;
 
         do {
-            try {
-                // get questions / make guess / count right answers
-                currentQuestion = GameController.getRandomQuestion(game);
-
-            } catch (Exception e) {
-                currentQuestion = null;
-            }
-
+            // get questions / make guess / count right answers
+            currentQuestion = GameController.getRandomQuestion(game);
 
             if (currentQuestion == null) {
                 // no more questions for the chosen categories
