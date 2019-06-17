@@ -8,3 +8,9 @@ SELECT player.id AS player_id, player.name, COUNT(game.id)
 FROM master_data_knowledge_test.player INNER JOIN master_data_knowledge_test.game ON player.id = game.player_id
 GROUP BY player.id
 ORDER BY player.id ASC;
+
+-- Count Player
+SELECT 
+	(SELECT COUNT(player.id) FROM master_data_knowledge_test.player) AS player_count,
+	(SELECT COUNT(game.id) FROM master_data_knowledge_test.game) AS game_count,
+	(SELECT COUNT(questionasked.id) FROM master_data_knowledge_test.questionasked) AS askedQuestions_count;

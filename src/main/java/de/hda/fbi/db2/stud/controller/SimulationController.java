@@ -95,7 +95,7 @@ public class SimulationController {
             for (int i = 0; i < playerCount; ++i){
                 // create player
                 Player player = new Player();
-                entityManager.persist(player);
+                //entityManager.persist(player);  //now at the end
 
                 // set name
                 player.setName("player" + groupName + "_" + i);
@@ -105,6 +105,7 @@ public class SimulationController {
                     genGame(player, allCategories);
                 }
 
+                entityManager.persist(player);
             }
             // -----------------------
 
@@ -117,18 +118,22 @@ public class SimulationController {
                 }
                 System.out.println("Erstellung abgeschlossen; Transaktion abschliessen ...");
             }
-            transaction.commit();
+            //entityManager.flush();
 
-            // clear ram
+            transaction.commit();
+            entityManager.clear();
+            // next => transaction.begin() ...
+
+            // End
             if (print) {  // print message?
                 if (printTime) {
                     Date timestempt = new Date();
                     System.out.print("> " + timestempt.toString() +
                         " (" + timestempt.getTime() + "): ");
                 }
-                System.out.println("Transaktion abgeschlossen; Speicher leeren ...");
+                System.out.println("Transaktion abgeschlossen; Speicher geleert.");
             }
-            entityManager.clear();
+
 
         } catch (RuntimeException e){
             // Rollback changes
@@ -146,7 +151,7 @@ public class SimulationController {
 
         // persist game
         // TODO(ruben): persist at the end = more performace??
-        entityManager.persist(game);
+        // entityManager.persist(game);  // now at the end
 
         // game settings
         game.setPlayer(player);
@@ -193,6 +198,8 @@ public class SimulationController {
         endDate = addToDate(endDate, daysToAdd, 0, 0, 0);
 
         game.setEndDatetime(endDate);
+
+        entityManager.persist(game);
     }
 
     private void simulateGameplay(Game game,  HashSet<Integer> usedQuestionIds) {
@@ -246,16 +253,10 @@ public class SimulationController {
 
         // modify
         newQuestAnswer.setSelectedAnswer(chosenAnswer);
-
-        // - add question / bidirectional
-        //entityManager.persist(question);  // takes to much time
+        // - add question
         newQuestAnswer.setQuestion(question);
-        //question.getAsked().add(newQuestAnswer);  // takes to much time
-
-        // - add game / bidirectional
-        //entityManager.persist(game); // takes to much time
+        // - add game
         newQuestAnswer.setGame(game);
-        //game.getAskesQuestions().add(newQuestAnswer);  // takes to much time
 
         // persist finished entity
         entityManager.persist(newQuestAnswer);
