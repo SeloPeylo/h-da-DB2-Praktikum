@@ -26,6 +26,8 @@ import de.hda.fbi.db2.stud.entity.QuestionAsked;
 public class SimulationController {
     private EntityManager entityManager;
     private CategoryController categoryController;
+    private Random random;
+
     private int countPlayer;
     private int countGamesEach;
     private int commitAfter;
@@ -34,9 +36,11 @@ public class SimulationController {
     public SimulationController(int countPlayer, int countGamesEach,
         int commitAfter, EntityManagerFactory emf) {
 
+        this.entityManager = emf.createEntityManager();
+        random = new Random();
         this.countPlayer = countPlayer;
         this.countGamesEach = countGamesEach;
-        this.entityManager = emf.createEntityManager();
+
         categoryController = new CategoryController();
         categoryController.load(this.entityManager);
         this.commitAfter = commitAfter;
@@ -130,11 +134,11 @@ public class SimulationController {
     }
 
     private void genGame(Player player, List<Category> allCategories) {
-        Random random = new Random();
         // create game
         Game game = new Game();
 
         // persist game
+        // TODO(ruben): persist at the end = more performace??
         entityManager.persist(game);
 
         // game settings
@@ -152,6 +156,7 @@ public class SimulationController {
         List<Category> gameCategories = new ArrayList<>();
 
         // get random categories
+        // TODO(ruben): make faster
         for (int i = 0; i < categoriesCount; ++i) {
             //int randomQuestionIndex = (int) (Math.random() * allCategories.size());
             int randomQuestionIndex = random.nextInt(allCategories.size()); // 0 - size
@@ -191,7 +196,10 @@ public class SimulationController {
 
         do {
             // get questions / make guess / count right answers
+            // TODO(ruben): make question selection faster
+            //System.out.println(">> GetQuestion - Start - " + (new Date()).getTime());
             currentQuestion = GameController.getRandomQuestion(game);
+            //System.out.println(">> GetQuestion - End - " + (new Date()).getTime());
 
             if (currentQuestion == null) {
                 // no more questions for the chosen categories
@@ -201,14 +209,16 @@ public class SimulationController {
             //int selectedAnswer = (int) (Math.random() * 4) + 1; // 1 - 4
             int selectedAnswer = random.nextInt(4) + 1;  // 1 - 4
 
+            System.out.println(">> addQuestionAnswer - Start - " + (new Date()).getTime());
             boolean correct = addQuestionAnswer(game, currentQuestion,
                 selectedAnswer, entityManager);
+            System.out.println(">> addQuestionAnswer - End - " + (new Date()).getTime());
 
             // save count of right answers in game
             if (correct) {
                 ++correctAnwers;
             }
-            // TODO(ruben): save count in game
+            // TODO(ruben): save count of correct questions in game
 
             ++questCount;
         } while (questCount < game.getMaxQuestions());
@@ -216,28 +226,31 @@ public class SimulationController {
 
     public static boolean addQuestionAnswer(Game game, Question question,
         int chosenAnswer, EntityManager entityManager){
+        // TODO(ruben): mave to game controller
+        // TODO(ruben): persist at the end = more performace??
 
         // get return value
         boolean answerCorrect = (question.getCorrectAnswer() == chosenAnswer);
 
         // create & add to persist
         QuestionAsked newQuestAnswer = new QuestionAsked();
-        entityManager.persist(newQuestAnswer);
+        //entityManager.persist(newQuestAnswer);  // Now at the end
 
         // modify
         newQuestAnswer.setSelectedAnswer(chosenAnswer);
 
         // - add question / bidirectional
-        // does not need persistence as nothing on the db is changed
-        //entityManager.persist(question);
+        //entityManager.persist(question);  // takes to much time
         newQuestAnswer.setQuestion(question);
-        question.getAsked().add(newQuestAnswer);
+        question.getAsked().add(newQuestAnswer);  // takes to much time
 
         // - add game / bidirectional
-        // does not need persistence as nothing on the db is changed
-        //entityManager.persist(game);
+        //entityManager.persist(game); // takes to much time
         newQuestAnswer.setGame(game);
-        game.getAskesQuestions().add(newQuestAnswer);
+        game.getAskesQuestions().add(newQuestAnswer);  // takes to much time
+
+        // persist finished entity
+        entityManager.persist(newQuestAnswer);
 
         return answerCorrect;
     }
