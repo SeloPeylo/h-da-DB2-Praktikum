@@ -118,7 +118,7 @@ public class Main {
                     // Practice 3: 10.000 Player, 100 Games each
                     // After 20 Player (= 2.000 Games) will be commited
                     SimulationController sc =
-                        new SimulationController(10000, 100, 10000, emf);
+                        new SimulationController(10000, 100, 10, emf);
 
                     // print info
                     Date startDate = new Date();

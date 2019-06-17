@@ -69,7 +69,7 @@ public class SimulationController {
 
         try {
             // Start Database transaction
-            System.out.println("Neue Transaktion (" + playerCount + ") Spieler)");
+            System.out.println("Neue Transaktion (" + playerCount + " Spieler erstellen ...)");
             transaction = entityManager.getTransaction();
             transaction.begin();
 
@@ -92,9 +92,11 @@ public class SimulationController {
             // -----------------------
 
             // commit changes
+            System.out.println("Erstellung abgeschlossen; Transaktion abschließen ...");
             transaction.commit();
 
             // clear ram
+            System.out.println("Transaktion abgeschlossen; Speicher leeren ...");
             entityManager.clear();
 
         } catch (RuntimeException e){
