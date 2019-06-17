@@ -201,13 +201,7 @@ public class GameController {
     }
 
     // non database methods
-    public static Question getRandomQuestion(Game game){
-        // get HashSet of used questions
-        HashSet<Integer> usedQuestionIds = new HashSet<>();
-        for (QuestionAsked qs : game.getAskesQuestions()){
-            usedQuestionIds.add(qs.getQuestion().getId());
-        }
-
+    public static Question getRandomQuestion(Game game, HashSet<Integer> usedQuestionIds){
         // get list of all unused questions
         ArrayList<Question> unusedQuestions = new ArrayList<>();
         for (Category cat : game.getCategories()){

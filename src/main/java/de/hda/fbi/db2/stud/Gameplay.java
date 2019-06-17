@@ -3,6 +3,7 @@ package de.hda.fbi.db2.stud;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Scanner;
 import de.hda.fbi.db2.stud.controller.GameController;
 import de.hda.fbi.db2.stud.entity.Category;
@@ -34,7 +35,8 @@ public class Gameplay {
         Game game = createNewGame(gameStartDate);
 
         // start game play
-        int[] score = playGame(game);
+        HashSet<Integer> usedQuestionIds = new HashSet<>();  // cache for used questions (only ids)
+        int[] score = playGame(game, usedQuestionIds);
 
         // get end date
         Date gameEndDate = new Date();
@@ -101,7 +103,7 @@ public class Gameplay {
         return game;
     }
 
-    private int[] playGame(Game game){
+    private int[] playGame(Game game, HashSet<Integer> usedQuestionIds){
         Scanner inputScanner = new Scanner(System.in, "utf-8");
 
         // while game not done
@@ -110,12 +112,15 @@ public class Gameplay {
         for (; questCount < game.getMaxQuestions(); ++questCount){
 
             // get next question
-            Question nextQuestion = GameController.getRandomQuestion(game);
+            Question nextQuestion = GameController.getRandomQuestion(game, usedQuestionIds);
 
             if (nextQuestion == null){
                 System.out.println("Keine neuen Fragen mehr vorhanden.");
                 break;
             }
+
+            // cache id of current question
+            usedQuestionIds.add(nextQuestion.getId());
 
             // print questions
             System.out.println();

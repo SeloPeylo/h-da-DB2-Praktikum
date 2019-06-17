@@ -38,8 +38,8 @@ public class Game {
     @ManyToOne
     private Player player;
 
-    @OneToMany(targetEntity = QuestionAsked.class, mappedBy = "game")
-    private List<QuestionAsked> askesQuestions;
+    //@OneToMany(targetEntity = QuestionAsked.class, mappedBy = "game")
+    //private List<QuestionAsked> askesQuestions;
 
     //@ManyToMany(targetEntity = Category.class, mappedBy = "games")
     @ManyToMany
@@ -57,7 +57,7 @@ public class Game {
         this.endDatetime = null;
         maxQuestions = 0;
         player = null;
-        askesQuestions = new ArrayList<>();
+        //askesQuestions = new ArrayList<>();
         categories = new ArrayList<>();
     }
 
@@ -89,7 +89,7 @@ public class Game {
             ", endDatetime=" + endDatetime +
             ", maxQuestions=" + maxQuestions +
             ", player.getId()=" + player.getId() +
-            ", askesQuestions.size()=" + askesQuestions.size() +
+            //", askesQuestions.size()=" + askesQuestions.size() +
             ", categories=" + categories +
             '}';
     }
@@ -137,6 +137,7 @@ public class Game {
         this.player = player;
     }
 
+    /*
     public List<QuestionAsked> getAskesQuestions() {
         return askesQuestions;
     }
@@ -144,6 +145,7 @@ public class Game {
     public void setAskesQuestions(List<QuestionAsked> askesQuestions) {
         this.askesQuestions = askesQuestions;
     }
+    */
 
     public List<Category> getCategories() {
         return categories;

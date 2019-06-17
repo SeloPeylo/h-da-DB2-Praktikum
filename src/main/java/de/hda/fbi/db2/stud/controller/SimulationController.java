@@ -4,6 +4,7 @@ package de.hda.fbi.db2.stud.controller;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import javax.persistence.EntityManager;
@@ -151,9 +152,9 @@ public class SimulationController {
         game.setMaxQuestions(questCount);
 
         // choose how may categories (random) 2-5
-        //int categoriesCount = (int) (Math.random() * 4) + 2;
         int categoriesCount = random.nextInt(4) + 2;  // 2 - 5
         List<Category> gameCategories = new ArrayList<>();
+        //HashSet<Integer> gameCatIndices = new HashSet<>();
 
         // get random categories
         // TODO(ruben): make faster
@@ -180,7 +181,8 @@ public class SimulationController {
         game.setStartDatetime(gameStartDate);
 
         // play game
-        simulateGameplay(game, random);
+        HashSet<Integer> usedQuestionIds = new HashSet<>();  // cache for used questions (only ids)
+        simulateGameplay(game, usedQuestionIds);
 
         // add end date =  start date + x
         Date endDate = new Date();
@@ -189,7 +191,7 @@ public class SimulationController {
         game.setEndDatetime(endDate);
     }
 
-    private void simulateGameplay(Game game, Random random) {
+    private void simulateGameplay(Game game,  HashSet<Integer> usedQuestionIds) {
         Question currentQuestion = null;
         int questCount = 0;
         int correctAnwers = 0;
@@ -197,27 +199,30 @@ public class SimulationController {
         do {
             // get questions / make guess / count right answers
             // TODO(ruben): make question selection faster
-            //System.out.println(">> GetQuestion - Start - " + (new Date()).getTime());
-            currentQuestion = GameController.getRandomQuestion(game);
-            //System.out.println(">> GetQuestion - End - " + (new Date()).getTime());
+            currentQuestion = GameController.getRandomQuestion(game, usedQuestionIds);
 
             if (currentQuestion == null) {
                 // no more questions for the chosen categories
                 break;
             }
 
+            // cache id of current question
+            usedQuestionIds.add(currentQuestion.getId());
+
             //int selectedAnswer = (int) (Math.random() * 4) + 1; // 1 - 4
             int selectedAnswer = random.nextInt(4) + 1;  // 1 - 4
 
-            System.out.println(">> addQuestionAnswer - Start - " + (new Date()).getTime());
+            //System.out.println(">> addQuestionAnswer - Start - " + (new Date()).getTime());
             boolean correct = addQuestionAnswer(game, currentQuestion,
                 selectedAnswer, entityManager);
-            System.out.println(">> addQuestionAnswer - End - " + (new Date()).getTime());
+            //System.out.println(">> addQuestionAnswer - End - " + (new Date()).getTime());
 
             // save count of right answers in game
             if (correct) {
                 ++correctAnwers;
             }
+
+
             // TODO(ruben): save count of correct questions in game
 
             ++questCount;
@@ -242,12 +247,12 @@ public class SimulationController {
         // - add question / bidirectional
         //entityManager.persist(question);  // takes to much time
         newQuestAnswer.setQuestion(question);
-        question.getAsked().add(newQuestAnswer);  // takes to much time
+        //question.getAsked().add(newQuestAnswer);  // takes to much time
 
         // - add game / bidirectional
         //entityManager.persist(game); // takes to much time
         newQuestAnswer.setGame(game);
-        game.getAskesQuestions().add(newQuestAnswer);  // takes to much time
+        //game.getAskesQuestions().add(newQuestAnswer);  // takes to much time
 
         // persist finished entity
         entityManager.persist(newQuestAnswer);
