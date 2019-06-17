@@ -49,6 +49,7 @@ public class SimulationController {
     public void runSimulation() {
         // Get all Categories
         List<Category> allCategories = categoryController.getCategories();
+        entityManager.clear();
 
         int count = 0;
         while (count < countPlayer) {
@@ -57,19 +58,28 @@ public class SimulationController {
                 groupSize = (countPlayer - count);
             }
 
-            runGroup(groupSize, countGamesEach, allCategories);
+            runGroup(groupSize, countGamesEach, allCategories, true, true);
 
             count += groupSize;
         }
+
+        //entityManager.getTransaction().commit();
     }
 
-    private void runGroup(int playerCount, int gamesCount, List<Category> allCategories){
+    private void runGroup(int playerCount, int gamesCount, List<Category> allCategories, boolean print,boolean printTime){
         EntityTransaction transaction = null;
         Long groupName = new Date().getTime();
 
         try {
+            // print start message
+            if (print) {  // print message?
+                if (printTime) {
+                    System.out.print("> " + (new Date()).toString() + ": ");
+                }
+                System.out.println("Neue Transaktion (" + playerCount + " Spieler erstellen ...)");
+            }
+
             // Start Database transaction
-            System.out.println("Neue Transaktion (" + playerCount + " Spieler erstellen ...)");
             transaction = entityManager.getTransaction();
             transaction.begin();
 
@@ -92,11 +102,21 @@ public class SimulationController {
             // -----------------------
 
             // commit changes
-            System.out.println("Erstellung abgeschlossen; Transaktion abschließen ...");
+            if (print) {  // print message?
+                if (printTime) {
+                    System.out.print("> " + (new Date()).toString() + ": ");
+                }
+                System.out.println("Erstellung abgeschlossen; Transaktion abschliessen ...");
+            }
             transaction.commit();
 
             // clear ram
-            System.out.println("Transaktion abgeschlossen; Speicher leeren ...");
+            if (print) {  // print message?
+                if (printTime) {
+                    System.out.print("> " + (new Date()).toString() + ": ");
+                }
+                System.out.println("Transaktion abgeschlossen; Speicher leeren ...");
+            }
             entityManager.clear();
 
         } catch (RuntimeException e){

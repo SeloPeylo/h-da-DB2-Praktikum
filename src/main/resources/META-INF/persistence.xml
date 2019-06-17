@@ -32,6 +32,11 @@
             <property name="eclipselink.logging.parameters" value="true"/>
             <property name="eclipselink.logging.timestamp" value="false"/>
             <property name="eclipselink.logging.session" value="false"/>
+
+            <!-- Batch Writing -->
+            <property name="eclipselink.jdbc.batch-writing" value="jdbc"/>
+            <property name="eclipselink.jdbc.batch-writing.size" value="1000"/>
+
         </properties>
     </persistence-unit>
     <persistence-unit name="locOraclePU" transaction-type="RESOURCE_LOCAL">

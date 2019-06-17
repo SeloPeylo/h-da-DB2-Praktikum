@@ -115,10 +115,17 @@ public class Main {
                     break;
 
                 case 3: // Run Simulation
-                    // Practice 3: 10.000 Player, 100 Games each
-                    // After 20 Player (= 2.000 Games) will be commited
+                    // Simulation Settings
+                    int playerCount = 10000;
+                    int countOfGames = 100;
+                    int commitAfter = 1;
+
+                    System.out.println("Simulationseinstellungen: ");
+                    System.out.println(playerCount + " Spieler");
+                    System.out.println("je " + countOfGames + " Spiele");
+                    System.out.println("Commit nach " + commitAfter + " Spielern");
                     SimulationController sc =
-                        new SimulationController(10000, 100, 10, emf);
+                        new SimulationController(playerCount, countOfGames, commitAfter, emf);
 
                     // print info
                     Date startDate = new Date();
