@@ -79,7 +79,9 @@ public class SimulationController {
             // print start message
             if (print) {  // print message?
                 if (printTime) {
-                    System.out.print("> " + (new Date()).toString() + ": ");
+                    Date timestempt = new Date();
+                    System.out.print("> " + timestempt.toString() +
+                        " (" + timestempt.getTime() + "): ");
                 }
                 System.out.println("Neue Transaktion (" + playerCount + " Spieler erstellen ...)");
             }
@@ -109,7 +111,9 @@ public class SimulationController {
             // commit changes
             if (print) {  // print message?
                 if (printTime) {
-                    System.out.print("> " + (new Date()).toString() + ": ");
+                    Date timestempt = new Date();
+                    System.out.print("> " + timestempt.toString() +
+                        " (" + timestempt.getTime() + "): ");
                 }
                 System.out.println("Erstellung abgeschlossen; Transaktion abschliessen ...");
             }
@@ -118,7 +122,9 @@ public class SimulationController {
             // clear ram
             if (print) {  // print message?
                 if (printTime) {
-                    System.out.print("> " + (new Date()).toString() + ": ");
+                    Date timestempt = new Date();
+                    System.out.print("> " + timestempt.toString() +
+                        " (" + timestempt.getTime() + "): ");
                 }
                 System.out.println("Transaktion abgeschlossen; Speicher leeren ...");
             }
@@ -147,7 +153,6 @@ public class SimulationController {
         player.getGames().add(game);
 
         // count questions = 1 - 10
-        //int questCount = (int) (Math.random() * 10) + 1;
         int questCount = random.nextInt(10) + 1;  // 1 - 10
         game.setMaxQuestions(questCount);
 
@@ -157,7 +162,7 @@ public class SimulationController {
         //HashSet<Integer> gameCatIndices = new HashSet<>();
 
         // get random categories
-        // TODO(ruben): make faster
+        // TODO(ruben): make faster? (curr less than 1ms)
         for (int i = 0; i < categoriesCount; ++i) {
             //int randomQuestionIndex = (int) (Math.random() * allCategories.size());
             int randomQuestionIndex = random.nextInt(allCategories.size()); // 0 - size
@@ -174,7 +179,6 @@ public class SimulationController {
         game.setCategories(gameCategories);
 
         // get start date Doday+(Random * 100days)
-        //int daysToAdd = (int) (Math.random() * 100); // 0 - 99
         int daysToAdd = random.nextInt(100); // 0 - 99
         Date gameStartDate = new Date();
         gameStartDate = addToDate(gameStartDate, daysToAdd, 0, 0, 0);
@@ -209,13 +213,12 @@ public class SimulationController {
             // cache id of current question
             usedQuestionIds.add(currentQuestion.getId());
 
-            //int selectedAnswer = (int) (Math.random() * 4) + 1; // 1 - 4
+            // select answer; random
             int selectedAnswer = random.nextInt(4) + 1;  // 1 - 4
 
-            //System.out.println(">> addQuestionAnswer - Start - " + (new Date()).getTime());
+            // save the selected answer
             boolean correct = addQuestionAnswer(game, currentQuestion,
                 selectedAnswer, entityManager);
-            //System.out.println(">> addQuestionAnswer - End - " + (new Date()).getTime());
 
             // save count of right answers in game
             if (correct) {
