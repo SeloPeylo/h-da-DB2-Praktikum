@@ -118,7 +118,7 @@ public class Main {
                     // Simulation Settings
                     int playerCount = 10000;
                     int countOfGames = 100;
-                    int commitAfter = 100;
+                    int commitAfter = 10000;
 
                     System.out.println("Simulationseinstellungen: ");
                     System.out.println(playerCount + " Spieler");

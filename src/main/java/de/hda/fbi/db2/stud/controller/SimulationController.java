@@ -4,8 +4,10 @@ package de.hda.fbi.db2.stud.controller;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -18,16 +20,19 @@ import de.hda.fbi.db2.stud.entity.Question;
 import de.hda.fbi.db2.stud.entity.QuestionAsked;
 
 
-
 /**
  * SimulationController class.
  *
  * @author Ruben van Laack
  */
 public class SimulationController {
+
     private EntityManager entityManager;
     private CategoryController categoryController;
     private Random random;
+
+    private ArrayList<Player> batchPlayer = null;
+    private ArrayList<List<QuestionAsked>> batchAskedQuestions = null;
 
     private int countPlayer;
     private int countGamesEach;
@@ -47,7 +52,7 @@ public class SimulationController {
         this.commitAfter = commitAfter;
     }
 
-    public void close(){
+    public void close() {
         entityManager.close();
     }
 
@@ -67,91 +72,43 @@ public class SimulationController {
 
             count += groupSize;
         }
-
-        //entityManager.getTransaction().commit();
     }
 
-    private void runGroup(int playerCount, int gamesCount, List<Category> allCategories, boolean print,boolean printTime){
-        EntityTransaction transaction = null;
+    private void runGroup(int playerCount, int gamesCount, List<Category> allCategories,
+        boolean print, boolean printTime) {
+        // print start message
+        if (print) {  // print message?
+            if (printTime) {
+                Date timestempt = new Date();
+                System.out.print("> " + timestempt.toString() +
+                    " (" + timestempt.getTime() + "): ");
+            }
+            System.out.println("Spieler erstellen ...)");
+        }
+
+        // create player & games
         Long groupName = new Date().getTime();
+        for (int i = 0; i < playerCount; ++i) {
+            // create player
+            Player player = new Player();
+            List<QuestionAsked> allAskedQuestions = new ArrayList<>();
 
-        try {
-            // print start message
-            if (print) {  // print message?
-                if (printTime) {
-                    Date timestempt = new Date();
-                    System.out.print("> " + timestempt.toString() +
-                        " (" + timestempt.getTime() + "): ");
-                }
-                System.out.println("Neue Transaktion (" + playerCount + " Spieler erstellen ...)");
+            // set name
+            player.setName("player" + groupName + "_" + i);
+
+            // play games
+            for (int j = 0; j < gamesCount; ++j) {
+                allAskedQuestions.addAll(genGame(player, allCategories));
             }
 
-            // Start Database transaction
-            transaction = entityManager.getTransaction();
-            transaction.begin();
-
-            // -----------------------
-
-            for (int i = 0; i < playerCount; ++i){
-                // create player
-                Player player = new Player();
-                //entityManager.persist(player);  //now at the end
-
-                // set name
-                player.setName("player" + groupName + "_" + i);
-
-                // play games
-                for (int j = 0; j < gamesCount; ++j){
-                    genGame(player, allCategories);
-                }
-
-                entityManager.persist(player);
-            }
-            // -----------------------
-
-            // commit changes
-            if (print) {  // print message?
-                if (printTime) {
-                    Date timestempt = new Date();
-                    System.out.print("> " + timestempt.toString() +
-                        " (" + timestempt.getTime() + "): ");
-                }
-                System.out.println("Erstellung abgeschlossen; Transaktion abschliessen ...");
-            }
-            //entityManager.flush();
-
-            transaction.commit();
-            entityManager.clear();
-            // next => transaction.begin() ...
-
-            // End
-            if (print) {  // print message?
-                if (printTime) {
-                    Date timestempt = new Date();
-                    System.out.print("> " + timestempt.toString() +
-                        " (" + timestempt.getTime() + "): ");
-                }
-                System.out.println("Transaktion abgeschlossen; Speicher geleert.");
-            }
-
-
-        } catch (RuntimeException e){
-            // Rollback changes
-            if (transaction != null && transaction.isActive()){
-                transaction.rollback();
-            }
-
-            throw new Error("Could not commit group of players and games.");
+            // commit
+            addToBatch(player, allAskedQuestions);
         }
     }
 
-    private void genGame(Player player, List<Category> allCategories) {
+    private List<QuestionAsked> genGame(Player player, List<Category> allCategories) {
         // create game
         Game game = new Game();
-
-        // persist game
-        // TODO(ruben): persist at the end = more performace??
-        // entityManager.persist(game);  // now at the end
 
         // game settings
         game.setPlayer(player);
@@ -167,7 +124,6 @@ public class SimulationController {
         //HashSet<Integer> gameCatIndices = new HashSet<>();
 
         // get random categories
-        // TODO(ruben): make faster? (curr less than 1ms)
         for (int i = 0; i < categoriesCount; ++i) {
             //int randomQuestionIndex = (int) (Math.random() * allCategories.size());
             int randomQuestionIndex = random.nextInt(allCategories.size()); // 0 - size
@@ -190,26 +146,26 @@ public class SimulationController {
         game.setStartDatetime(gameStartDate);
 
         // play game
-        HashSet<Integer> usedQuestionIds = new HashSet<>();  // cache for used questions (only ids)
-        simulateGameplay(game, usedQuestionIds);
+        List<QuestionAsked> qs = simulateGameplay(game);
 
-        // add end date =  start date + x
+        // add end date = start date + x
         Date endDate = new Date();
         endDate = addToDate(endDate, daysToAdd, 0, 0, 0);
-
         game.setEndDatetime(endDate);
 
-        entityManager.persist(game);
+        return qs;
     }
 
-    private void simulateGameplay(Game game,  HashSet<Integer> usedQuestionIds) {
+    private List<QuestionAsked> simulateGameplay(Game game) {
+        HashSet<Integer> usedQuestionIds = new HashSet<>();  // cache for used questions (only ids)
+        List<QuestionAsked> qs = new ArrayList<>();  // list of asked questions for new game
+
         Question currentQuestion = null;
         int questCount = 0;
         int correctAnwers = 0;
 
         do {
             // get questions / make guess / count right answers
-            // TODO(ruben): make question selection faster
             currentQuestion = GameController.getRandomQuestion(game, usedQuestionIds);
 
             if (currentQuestion == null) {
@@ -224,45 +180,136 @@ public class SimulationController {
             int selectedAnswer = random.nextInt(4) + 1;  // 1 - 4
 
             // save the selected answer
-            boolean correct = addQuestionAnswer(game, currentQuestion,
-                selectedAnswer, entityManager);
+            QuestionAsked newQuestAnswer = new QuestionAsked();
+            newQuestAnswer.setSelectedAnswer(selectedAnswer);
+            newQuestAnswer.setQuestion(currentQuestion);
+            newQuestAnswer.setGame(game);
+            qs.add(newQuestAnswer);
+
+            // evaluate answer
+            boolean correct = (selectedAnswer == currentQuestion.getCorrectAnswer());
 
             // save count of right answers in game
             if (correct) {
                 ++correctAnwers;
             }
 
-
             // TODO(ruben): save count of correct questions in game
 
             ++questCount;
         } while (questCount < game.getMaxQuestions());
+
+        return qs;
     }
 
-    public static boolean addQuestionAnswer(Game game, Question question,
-        int chosenAnswer, EntityManager entityManager){
-        // TODO(ruben): mave to game controller
-        // TODO(ruben): persist at the end = more performace??
+    private void addToBatch(Player player, List<QuestionAsked> asked) {
+        // batch size
+        final int batchSize = 100;
 
-        // get return value
-        boolean answerCorrect = (question.getCorrectAnswer() == chosenAnswer);
+        // create new batch?
+        if (batchPlayer == null || batchAskedQuestions == null ) {
+            batchPlayer = new ArrayList<>();
+            batchAskedQuestions = new ArrayList<>();
+        }
 
-        // create & add to persist
-        QuestionAsked newQuestAnswer = new QuestionAsked();
-        //entityManager.persist(newQuestAnswer);  // Now at the end
+        batchPlayer.add(player);
+        batchAskedQuestions.add(asked);
 
-        // modify
-        newQuestAnswer.setSelectedAnswer(chosenAnswer);
-        // - add question
-        newQuestAnswer.setQuestion(question);
-        // - add game
-        newQuestAnswer.setGame(game);
-
-        // persist finished entity
-        entityManager.persist(newQuestAnswer);
-
-        return answerCorrect;
+        if (batchPlayer.size() >= batchSize){
+            commitAll(true, true);
+        }
     }
+
+    private void commitAll(boolean print, boolean printTime) {
+
+        if (batchPlayer.size() != batchAskedQuestions.size()){
+            throw new Error("Array size of players does not match array size of asked questions.");
+        }
+
+        // print start message
+        if (print) {  // print message?
+            if (printTime) {
+                Date timestempt = new Date();
+                System.out.print("> " + timestempt.toString() +
+                    " (" + timestempt.getTime() + "): ");
+            }
+            System.out.println("Start commit of batch (" + batchPlayer.size() + " Spieler) ...)");
+        }
+
+        //
+        EntityTransaction transaction = null;
+        try {
+            // Start Database transaction
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            // persist all player
+            for (int i = 0; i < batchPlayer.size(); ++i) {
+                Player player = batchPlayer.get(i);
+
+                // player
+                entityManager.persist(player);
+            }
+
+            // persist all games
+            for (int i = 0; i < batchPlayer.size(); ++i) {
+                Player player = batchPlayer.get(i);
+
+                // games
+                for (Game g : player.getGames()) {
+                    entityManager.persist(g);
+                }
+            }
+
+            // persist all askedQuestions
+            for (int i = 0; i < batchAskedQuestions.size(); ++i) {
+                List<QuestionAsked> asked = batchAskedQuestions.get(i);
+
+                // asked questions for games
+                for (QuestionAsked qs : asked) {
+                    entityManager.persist(qs);
+                }
+            }
+
+            // ---- Commit --------
+            transaction.commit();
+            entityManager.clear();
+
+            // ---- Empty Batch --------
+            batchPlayer = null;
+            batchAskedQuestions = null;
+
+        } catch (RuntimeException e) {
+            // Rollback changes
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+
+            throw new Error("Could not commit group of players and games.");
+        }
+    }
+
+    /*
+    for (int i = 0; i < batchPlayer.size(); ++i) {
+                Player player = batchPlayer.get(i);
+                List<QuestionAsked> asked = batchAskedQuestions.get(i);
+
+                // ---- Persist Elements ---------
+                // player
+                entityManager.persist(player);
+
+                // games
+                for (Game g : player.getGames()) {
+                    entityManager.persist(g);
+                }
+
+                // asked questions for games
+                for (QuestionAsked qs : asked) {
+                    entityManager.persist(qs);
+                }
+                // -------------------------------
+            }
+     */
 
     public static Date addToDate(Date date, int days, int hours, int minutes, int seconds) {
         Calendar cal = Calendar.getInstance();

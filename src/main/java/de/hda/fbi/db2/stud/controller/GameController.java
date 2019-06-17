@@ -180,8 +180,9 @@ public class GameController {
             transaction.begin();
 
             // -- modify database here --
-            answerCorrect = SimulationController.addQuestionAnswer(game, question,
-                chosenAnswer, entityManager);
+            // TODO(ruben): fix this!!
+            //answerCorrect = SimulationController.addQuestionAnswer(game, question,
+            //    chosenAnswer, entityManager);
 
             // -- end modify --
 
