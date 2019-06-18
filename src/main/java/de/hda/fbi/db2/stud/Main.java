@@ -117,17 +117,17 @@ public class Main {
 
                 case 3: // Run Simulation
                     // Simulation Settings
-                    //TODO(ruben): check simulation parameter, before submission of p#4
-                    final int playerCount = 1000; //2500; //10000;
+                    final int playerCount = 10000; //2500; //10000;
                     final int countOfGames = 100;
                     final int batchSize = 50;  // same as in persistance.xml
-                    final int threadCount = 1;
+                    final int threadCount = 4;
 
                     System.out.println("Simulationseinstellungen: ");
                     System.out.println(playerCount + " Spieler");
                     System.out.println("je " + countOfGames + " Spiele");
                     System.out.println("Flush & Clear nach " + batchSize + " Spielern");
-                    SimulationController sc = new SimulationController(playerCount, countOfGames, batchSize, emf);
+                    //SimulationController sc =
+                    // new SimulationController(playerCount, countOfGames, batchSize, emf);
 
                     // print info
                     Date startDate = new Date();
@@ -135,7 +135,8 @@ public class Main {
 
                     // run simulation
                     //sc.runSimulation();
-                    //SimulationController.multithreadedSimulation(threadCount, playerCount, countOfGames, batchSize, emf);
+                    SimulationController.multithreadedSimulation(threadCount,
+                        playerCount, countOfGames, batchSize, emf);
 
                     // print info - finished & runtime
                     Date endDate = new Date();

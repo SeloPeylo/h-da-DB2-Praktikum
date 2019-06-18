@@ -38,6 +38,7 @@
             <property name="eclipselink.jdbc.batch-writing" value="jdbc"/>
             <!-- Batch size should be int value between 1 - 50 -->
             <property name="eclipselink.jdbc.batch-writing.size" value="50"/>
+
             <!--
             <property name="eclipselink.order_inserts" value="true"/>
             <property name="eclipselink.order_updates" value="true"/>

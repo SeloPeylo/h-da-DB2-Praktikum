@@ -193,6 +193,8 @@ public class SimulationController {
             entityManager.clear();
 
         } catch (RuntimeException e){
+            e.printStackTrace();
+
             // Rollback changes
             if (transaction != null && transaction.isActive()){
                 transaction.rollback();
