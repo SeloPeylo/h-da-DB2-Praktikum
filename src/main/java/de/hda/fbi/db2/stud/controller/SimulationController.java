@@ -4,10 +4,8 @@ package de.hda.fbi.db2.stud.controller;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -28,28 +26,102 @@ import de.hda.fbi.db2.stud.entity.QuestionAsked;
 public class SimulationController {
 
     private EntityManager entityManager;
-    private CategoryController categoryController;
+    private CategoryController categoryController = null;
     private Random random;
-
-    private ArrayList<Player> batchPlayer = null;
-    private ArrayList<List<QuestionAsked>> batchAskedQuestions = null;
 
     private int countPlayer;
     private int countGamesEach;
-    private int commitAfter;
+    private int batchSize;
 
+    public static boolean multithreadedSimulation(final int threads, final int totalPlayer,
+        final int gamesPerPlayer, final int batchSize, final EntityManagerFactory emf){
 
-    public SimulationController(int countPlayer, int countGamesEach,
-        int commitAfter, EntityManagerFactory emf) {
+        // check parameter
+        if (threads <= 0) {
+            throw new Error("Error: 0 threads is not an option!");
+        }
+        if ((totalPlayer % threads) != 0) {
+            throw new Error("Error players have to be dividable equally to all threads.");
+        }
+
+        // Variables
+        final int playerPerThread = totalPlayer / threads;  // e.g. 10.000 / 4 = 2.500
+        boolean finishedSuccessfull = true;
+        List<Thread> simulationThreads = new ArrayList<>();
+
+        // create threads
+        for (int i = 0; i < threads; ++i) {
+
+            // create thread
+            Thread simulationThread = new Thread("Simulation " + i){
+                public void run(){
+                    // print
+                    System.out.println("Start des Simulationsthead: " + this.getName() +
+                        " (" + playerPerThread + " Spieler mit je " + gamesPerPlayer
+                            + " Spielen und " +
+                        "'flush' nach: " + batchSize + " Entities)"
+                        );
+
+                    // create new simulation
+                    SimulationController sc =
+                        new SimulationController(playerPerThread, gamesPerPlayer, batchSize, emf);
+
+                    // run simulation
+                    Date start = new Date();
+                    sc.runSimulation();
+                    Date end = new Date();
+
+                    // calc simulation time
+                    long simtime = end.getTime() - start.getTime();
+
+                    // close
+                    sc.close();
+
+                    // print
+                    System.out.println("Simulationsthead: " + this.getName() +
+                        " nach " + (simtime / 60000) + "," + (simtime % 60000) +
+                        " min abgeschlossen.");
+                }
+            };
+
+            // start thread
+            simulationThread.start();
+
+            // add to list
+            simulationThreads.add(simulationThread);
+        }
+
+        // block calling thread until all simulations are finished
+        for (Thread currSimulationThread : simulationThreads) {
+
+            try {
+                currSimulationThread.join();
+
+            } catch (InterruptedException e) {
+                System.out.println("InterruptedException while joining "
+                    + currSimulationThread.getName());
+                e.printStackTrace();
+                finishedSuccessfull = false;
+            }
+        }
+
+        return finishedSuccessfull;
+    }
+
+    public SimulationController(final int countPlayer, final int countGamesEach,
+        final int batchSize, final EntityManagerFactory emf) {
 
         this.entityManager = emf.createEntityManager();
         random = new Random();
+
+        // simulation settings
         this.countPlayer = countPlayer;
         this.countGamesEach = countGamesEach;
+        this.batchSize = batchSize;
 
+        // load list of possible categories
         categoryController = new CategoryController();
         categoryController.load(this.entityManager);
-        this.commitAfter = commitAfter;
     }
 
     public void close() {
@@ -57,73 +129,77 @@ public class SimulationController {
     }
 
     public void runSimulation() {
-        //TODO(ruben): try-catch-block
-        //TODO(ruben): paramenter
-        final int playerCount = 1000;
-        final int gamesCount = 100;
-        final int batchSize = 50;
-        Long groupName = new Date().getTime();
+        final int playerCount = this.countPlayer;
+        final int gamesCount = this.countGamesEach;
+        final int batchSize = this.batchSize;
+        final Long simulationName = new Date().getTime();
 
         // Get all Categories
         List<Category> allCategories = categoryController.getCategories();
-        entityManager.clear();
+        entityManager.clear();  // remove cache from loading
 
-        // Start Database transaction
-        EntityTransaction transaction = entityManager.getTransaction();
-        transaction.begin();
+        // create entities & persist then commit
+        EntityTransaction transaction = null;
+        try {
+            // Start Database transaction
+            transaction = entityManager.getTransaction();
+            transaction.begin();
 
-        // ---- persist, flush, clear ----
-        // for each player
-        int batchCounter = 0;
-        for (int p = 0; p < playerCount; ++p) {
+            // ---- create, persist, flush and clear ----
+            // for each player
+            int batchCounter = 0;
+            for (int p = 0; p < playerCount; ++p) {
 
-            // create player
-            Player player = new Player();
-            player.setName("player" + groupName + "_" + p);
+                // create player
+                Player player = new Player();
+                player.setName("player" + simulationName + "_" + p);
 
-            //persist player
-            entityManager.persist(player);
-            ++batchCounter; // increase for every persist
-
-
-            // for each game
-            for (int g = 0; g < gamesCount; ++g){
-
-                // create game
-                Game game = genGame(player, allCategories);
-
-                // add end date to game = start date + x
-                int hoursToAdd = random.nextInt(24); // 0 - 23
-                Date endDate = addToDate(
-                    game.getStartDatetime(), 0, hoursToAdd, 0, 0);
-                game.setEndDatetime(endDate);
-
-                //persist game
-                entityManager.persist(game);
+                //persist player
+                entityManager.persist(player);
                 ++batchCounter; // increase for every persist
 
-                //simulate game play
-                List<QuestionAsked> gameQuestions = simulateGameplay(game);
 
-                // for each question in game
-                for (QuestionAsked gameQuestion : gameQuestions) {
-                    //persist gameQuestion
-                    entityManager.persist(gameQuestion);
+                // for each game
+                for (int g = 0; g < gamesCount; ++g){
+
+                    // create game
+                    Game game = genGame(player, allCategories);
+
+                    //persist game
+                    entityManager.persist(game);
                     ++batchCounter; // increase for every persist
 
-                    // flush every 20th entity that is persisted
-                    if ((batchCounter % batchSize) == 0) {  // should be same as JDBC batch size
-                        //flush a batch of inserts and release memory:
-                        entityManager.flush();
-                        entityManager.clear();
+                    //simulate game play
+                    List<QuestionAsked> gameQuestions = simulateGameplay(game);
+
+                    // for each question in game
+                    for (QuestionAsked gameQuestion : gameQuestions) {
+                        //persist gameQuestion
+                        entityManager.persist(gameQuestion);
+                        ++batchCounter; // increase for every persist
+
+                        // flush every 20th entity that is persisted
+                        if ((batchCounter % batchSize) == 0) {  // should be same as JDBC batch size
+                            //flush a batch of inserts and release memory:
+                            entityManager.flush();
+                            entityManager.clear();
+                        }
                     }
                 }
             }
-        }
 
-        // ---- Commit --------
-        transaction.commit();
-        entityManager.clear();
+            // ---- Commit --------
+            transaction.commit();
+            entityManager.clear();
+
+        } catch (RuntimeException e){
+            // Rollback changes
+            if (transaction != null && transaction.isActive()){
+                transaction.rollback();
+            }
+
+            throw new Error("Error in Simulation or Commit");
+        }
     }
 
     private Game genGame(Player player, List<Category> allCategories) {
@@ -141,7 +217,6 @@ public class SimulationController {
         // choose how may categories (random) 2-5
         int categoriesCount = random.nextInt(4) + 2;  // 2 - 5
         List<Category> gameCategories = new ArrayList<>();
-        //HashSet<Integer> gameCatIndices = new HashSet<>();
 
         // get random categories
         for (int i = 0; i < categoriesCount; ++i) {
@@ -168,13 +243,14 @@ public class SimulationController {
         /*
         // play game
         List<QuestionAsked> qs = simulateGameplay(game);
+        */
 
-        // add end date = start date + x
-        Date endDate = new Date();
-        endDate = addToDate(endDate, daysToAdd, 0, 0, 0);
+        // add end date to game = start date + x
+        int hoursToAdd = random.nextInt(24); // 0 - 23
+        Date endDate = addToDate(gameStartDate, 0, hoursToAdd, 0, 0);
         game.setEndDatetime(endDate);
-         */
 
+        // return game obj.
         return game;
     }
 
@@ -224,7 +300,7 @@ public class SimulationController {
         return qs;
     }
 
-    public static Date addToDate(Date date, int days, int hours, int minutes, int seconds) {
+    public static Date addToDate(final Date date, int days, int hours, int minutes, int seconds) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         if (days != 0) {

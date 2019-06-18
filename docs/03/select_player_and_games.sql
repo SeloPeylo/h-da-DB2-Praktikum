@@ -9,6 +9,14 @@ FROM master_data_knowledge_test.player INNER JOIN master_data_knowledge_test.gam
 GROUP BY player.id
 ORDER BY player.id ASC;
 
+-- Games & asked Questions
+SELECT game.id AS game_id, game.startdatetime, game.enddatetime, game.maxquestions, questionasked.selectedanswer, 
+	question.id AS quest_id, question.correctanswer, question.answers1, question.answers2, question.answers3, question.answers4
+FROM master_data_knowledge_test.game 
+	INNER JOIN master_data_knowledge_test.questionasked ON game.id = questionasked.game_id
+	INNER JOIN master_data_knowledge_test.question ON questionasked.question_id = question.id
+WHERE game.player_id = 1;
+
 -- Count Player
 SELECT 
 	(SELECT COUNT(player.id) FROM master_data_knowledge_test.player) AS player_count,

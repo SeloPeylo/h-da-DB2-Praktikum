@@ -20,13 +20,15 @@ import javax.persistence.Table;
 @Entity
 //@Table(name = "player")
 @Table(name = "player", schema = "master_data_knowledge_test")
-@SequenceGenerator(name="master_data_knowledge_test.player_seq", initialValue=1, allocationSize=10000)
+@SequenceGenerator(name = "master_data_knowledge_test.player_id_seq",
+    initialValue = 1, allocationSize = 10000)
 public class Player {
 
     // Vars
     @Id
     //@GeneratedValue(strategy = GenerationType.IDENTITY)
-    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="master_data_knowledge_test.player_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,
+        generator = "master_data_knowledge_test.player_id_seq")
     private int id;
 
     @Column(unique = true)

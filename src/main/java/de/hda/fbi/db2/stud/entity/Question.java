@@ -25,6 +25,7 @@ public class Question {
     @Id
     private int id;
     private String questionText;
+    //TODO(ruben): fix typo answers1 -> answer1
     private String answers1;
     private String answers2;
     private String answers3;

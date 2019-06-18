@@ -25,13 +25,15 @@ import javax.persistence.UniqueConstraint;
 @Entity
 //@Table(name = "game")
 @Table(name = "game", schema = "master_data_knowledge_test")
-@SequenceGenerator(name="master_data_knowledge_test.game_seq", initialValue=1, allocationSize=1000000)
+@SequenceGenerator(name = "master_data_knowledge_test.game_id_seq",
+    initialValue = 1, allocationSize = 1000000)
 public class Game {
 
     // Vars
     @Id
     //@GeneratedValue(strategy = GenerationType.IDENTITY)
-    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="master_data_knowledge_test.game_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,
+        generator = "master_data_knowledge_test.game_id_seq")
     private int id;
 
     private Date startDatetime;

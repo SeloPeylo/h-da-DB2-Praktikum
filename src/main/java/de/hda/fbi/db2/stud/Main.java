@@ -82,7 +82,6 @@ public class Main {
 
             //TODO(ruben): check for option 1-3 if at least one category & one question exist!
 
-
             switch (chosenOption){
                 default:
                     System.out.println("Default");
@@ -118,25 +117,25 @@ public class Main {
 
                 case 3: // Run Simulation
                     // Simulation Settings
-                    int playerCount = 10000;
-                    int countOfGames = 100;
-                    int commitAfter = 10000;
+                    //TODO(ruben): check simulation parameter, before submission of p#4
+                    final int playerCount = 1000; //2500; //10000;
+                    final int countOfGames = 100;
+                    final int batchSize = 50;  // same as in persistance.xml
+                    final int threadCount = 1;
 
                     System.out.println("Simulationseinstellungen: ");
                     System.out.println(playerCount + " Spieler");
                     System.out.println("je " + countOfGames + " Spiele");
-                    System.out.println("Commit nach " + commitAfter + " Spielern");
-                    SimulationController sc =
-                        new SimulationController(playerCount, countOfGames, commitAfter, emf);
+                    System.out.println("Flush & Clear nach " + batchSize + " Spielern");
+                    SimulationController sc = new SimulationController(playerCount, countOfGames, batchSize, emf);
 
                     // print info
                     Date startDate = new Date();
-                    System.out.println("Simulation von 1.000.000 Spielen (10.000 Spieler).");
-                    System.out.println("Startzeit: " + startDate.toString());
-                    System.out.println("Start ...");
+                    System.out.println("Start ... (Startzeit: " + startDate.toString() + ")");
 
                     // run simulation
-                    sc.runSimulation();
+                    //sc.runSimulation();
+                    //SimulationController.multithreadedSimulation(threadCount, playerCount, countOfGames, batchSize, emf);
 
                     // print info - finished & runtime
                     Date endDate = new Date();
@@ -145,11 +144,10 @@ public class Main {
                         + " (Start war: " + startDate.toString() + ")");
                     long runtime = (endDate.getTime() - startDate.getTime());
                     System.out.println("Differenz: " + runtime);
-                    long runtimeMinutes = runtime / 60000; // 1s = 1000ms;
-                    long runtimeRest = runtime % 60000; // 1s = 1000ms;
-                    System.out.println("Differenz in Minuten: " + runtimeMinutes + "," + runtimeRest);
+                    System.out.println("Differenz in Minuten: " +
+                        (runtime / 60000) + "," + (runtime % 60000));
 
-                    sc.close();
+                    //sc.close();
                     break;
                 case 4: // End Programm
                     System.out.println("Programm wird gestoppt.");

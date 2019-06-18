@@ -181,7 +181,7 @@ public class GameController {
 
             // -- modify database here --
             // TO DO(ruben): fix this!!
-            // TODO(ruben): test if it works as expected??
+            // TO DO(ruben): test if it works as expected??
             //answerCorrect = SimulationController.addQuestionAnswer(game, question,
             //    chosenAnswer, entityManager);
 
@@ -223,6 +223,8 @@ public class GameController {
 
     // non database methods
     public static Question getRandomQuestion(Game game, HashSet<Integer> usedQuestionIds){
+        // TODO(ruben): cache list and remove used question instead of crating list each time!
+
         // get list of all unused questions
         ArrayList<Question> unusedQuestions = new ArrayList<>();
         for (Category cat : game.getCategories()){
@@ -235,9 +237,7 @@ public class GameController {
             }
         }
 
-        // -- Math.random() = rand ∈ (rand >= 0 && rand < 1)
-        // -- (rand * size) = randIndex ∈(randIndex >= 0 && randIndex < size)
-
+        // get question out of unused
         if (unusedQuestions.size() > 0){
             int randomQuestionIndex = (int) (Math.random() * unusedQuestions.size());
             Question randomQuestion = unusedQuestions.get(randomQuestionIndex);
