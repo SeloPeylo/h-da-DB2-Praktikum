@@ -119,7 +119,7 @@ public class Main {
                     // Simulation Settings
                     final int playerCount = 10000; //2500; //10000;
                     final int countOfGames = 100;
-                    final int batchSize = 50;  // same as in persistance.xml
+                    final int batchSize = 1000;  // same as in persistance.xml
                     final int threadCount = 4;
 
                     System.out.println("Simulationseinstellungen: ");
