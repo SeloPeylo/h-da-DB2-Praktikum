@@ -180,10 +180,30 @@ public class GameController {
             transaction.begin();
 
             // -- modify database here --
-            // TODO(ruben): fix this!!
+            // TO DO(ruben): fix this!!
+            // TODO(ruben): test if it works as expected??
             //answerCorrect = SimulationController.addQuestionAnswer(game, question,
             //    chosenAnswer, entityManager);
 
+            // create & add to persist
+            QuestionAsked newQuestAnswer = new QuestionAsked();
+            entityManager.persist(newQuestAnswer);
+
+            // modify
+            newQuestAnswer.setSelectedAnswer(chosenAnswer);
+
+            // - add question
+            //entityManager.persist(question);  // removed for performace
+            newQuestAnswer.setQuestion(question);
+            //question.newQuestAnswer().add(newQuestAnswer);  // removed for performace
+
+            // - add game
+            //entityManager.persist(game);  // removed for performace
+            newQuestAnswer.setGame(game);
+            //game.newQuestAnswer().add(newQuestAnswer);  // removed for performace
+
+            // get return value
+            answerCorrect = (question.getCorrectAnswer() == chosenAnswer);
             // -- end modify --
 
             // commit changes
