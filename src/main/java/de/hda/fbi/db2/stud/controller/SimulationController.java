@@ -59,8 +59,9 @@ public class SimulationController {
     public void runSimulation() {
         //TODO(ruben): try-catch-block
         //TODO(ruben): paramenter
-        int playerCount = 10000;
-        int gamesCount = 100;
+        final int playerCount = 1000;
+        final int gamesCount = 100;
+        final int batchSize = 50;
         Long groupName = new Date().getTime();
 
         // Get all Categories
@@ -91,6 +92,12 @@ public class SimulationController {
                 // create game
                 Game game = genGame(player, allCategories);
 
+                // add end date to game = start date + x
+                int hoursToAdd = random.nextInt(24); // 0 - 23
+                Date endDate = addToDate(
+                    game.getStartDatetime(), 0, hoursToAdd, 0, 0);
+                game.setEndDatetime(endDate);
+
                 //persist game
                 entityManager.persist(game);
                 ++batchCounter; // increase for every persist
@@ -105,18 +112,12 @@ public class SimulationController {
                     ++batchCounter; // increase for every persist
 
                     // flush every 20th entity that is persisted
-                    if ((batchCounter % 20) == 0) {  //20, same as the JDBC batch size
+                    if ((batchCounter % batchSize) == 0) {  // should be same as JDBC batch size
                         //flush a batch of inserts and release memory:
                         entityManager.flush();
                         entityManager.clear();
                     }
                 }
-
-                // add end date to game = start date + x
-                int hoursToAdd = random.nextInt(24); // 0 - 23
-                Date endDate = addToDate(
-                    game.getStartDatetime(), 0, hoursToAdd, 0, 0);
-                game.setEndDatetime(endDate);
             }
         }
 

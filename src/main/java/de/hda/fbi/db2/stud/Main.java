@@ -80,6 +80,8 @@ public class Main {
             chosenOption = inputScanner.nextInt();  // read int
             System.out.println(); // line break
 
+            //TODO(ruben): check for option 1-3 if at least one category & one question exist!
+
 
             switch (chosenOption){
                 default:
@@ -136,7 +138,7 @@ public class Main {
                     // run simulation
                     sc.runSimulation();
 
-                    // print info
+                    // print info - finished & runtime
                     Date endDate = new Date();
                     System.out.println("Simulation abgeschlossen.");
                     System.out.println("Endzeit: " + endDate.toString()
@@ -144,7 +146,8 @@ public class Main {
                     long runtime = (endDate.getTime() - startDate.getTime());
                     System.out.println("Differenz: " + runtime);
                     long runtimeMinutes = runtime / 60000; // 1s = 1000ms;
-                    System.out.println("Differenz in Minuten: " + runtimeMinutes);
+                    long runtimeRest = runtime % 60000; // 1s = 1000ms;
+                    System.out.println("Differenz in Minuten: " + runtimeMinutes + "," + runtimeRest);
 
                     sc.close();
                     break;

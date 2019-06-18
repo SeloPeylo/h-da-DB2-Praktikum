@@ -13,6 +13,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -24,11 +25,13 @@ import javax.persistence.UniqueConstraint;
 @Entity
 //@Table(name = "game")
 @Table(name = "game", schema = "master_data_knowledge_test")
+@SequenceGenerator(name="master_data_knowledge_test.game_seq", initialValue=1, allocationSize=1000000)
 public class Game {
 
     // Vars
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="master_data_knowledge_test.game_seq")
     private int id;
 
     private Date startDatetime;

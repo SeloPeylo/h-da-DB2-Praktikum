@@ -6,6 +6,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 /**
@@ -16,11 +17,13 @@ import javax.persistence.Table;
 @Entity
 //@Table(name = "questionasked")
 @Table(name = "questionasked", schema = "master_data_knowledge_test")
+@SequenceGenerator(name="master_data_knowledge_test.questionasked_seq", initialValue=1, allocationSize=1000000)
 public class QuestionAsked {
 
     // Vars
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="master_data_knowledge_test.questionasked_seq")
     private int id;
     private int selectedAnswer;
     //private boolean correct;

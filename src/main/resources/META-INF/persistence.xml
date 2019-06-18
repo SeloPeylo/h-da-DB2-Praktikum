@@ -21,9 +21,9 @@
             <property name="javax.persistence.jdbc.user" value="jpauser"/>
             <property name="javax.persistence.jdbc.password" value="JpaPassword"/>
 
-            <property name="javax.persistence.schema-generation.database.action" value="none"/>
+            <!--<property name="javax.persistence.schema-generation.database.action" value="none"/>-->
             <!--<property name="javax.persistence.schema-generation.database.action" value="create"/>-->
-            <!--<property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>-->
+            <property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>
 
             <property name="eclipselink.logging.level" value="WARNING"/>
             <property name="eclipselink.logging.exceptions" value="false"/>
@@ -35,7 +35,8 @@
 
             <!-- Batch Writing -->
             <property name="eclipselink.jdbc.batch-writing" value="jdbc"/>
-            <property name="eclipselink.jdbc.batch-writing.size" value="20"/>
+            <!-- Batch size should be int value between 1 - 50 -->
+            <property name="eclipselink.jdbc.batch-writing.size" value="50"/>
             <property name="eclipselink.order_inserts" value="true"/>
             <property name="eclipselink.order_updates" value="true"/>
 

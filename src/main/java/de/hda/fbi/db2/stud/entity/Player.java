@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 /**
@@ -19,11 +20,13 @@ import javax.persistence.Table;
 @Entity
 //@Table(name = "player")
 @Table(name = "player", schema = "master_data_knowledge_test")
+@SequenceGenerator(name="master_data_knowledge_test.player_seq", initialValue=1, allocationSize=10000)
 public class Player {
 
     // Vars
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="master_data_knowledge_test.player_seq")
     private int id;
 
     @Column(unique = true)
