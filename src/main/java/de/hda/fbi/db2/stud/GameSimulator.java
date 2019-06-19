@@ -1,54 +1,58 @@
 package de.hda.fbi.db2.stud;
 
+import de.hda.fbi.db2.stud.controller.GameController;
 import java.util.Date;
-import java.util.HashMap;
 import de.hda.fbi.db2.stud.controller.CategoryController;
 import de.hda.fbi.db2.stud.entity.Category;
 import de.hda.fbi.db2.stud.entity.Game;
 import de.hda.fbi.db2.stud.entity.Player;
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 
 public class GameSimulator {
 
-  private int countPlayer;
-  private int countGamesEach;
-  private int countPersist = 0;
-  private int countPersistBeforeFlush = 1000; //Number of Persists after which to flush
+  private int numberOfPlayers;
+  private int numberOfGamesPerPlayer;
+  private int questionsPerGame = 8;
+  private int persistCounter = 0;
+  private int persistCountTotal = 0;
   private EntityManager entityManager;
-  private CategoryController catCon;
-  HashMap<String, Category> categories = null;
+  EntityTransaction transaction;
 
-  public GameSimulator(int countPlayer, int countGamesEach, EntityManagerFactory emf) {
-    this.countPlayer = countPlayer;
-    this.countGamesEach = countGamesEach;
+  private CategoryController catCon;
+  private List<Category> gameCategories;
+
+  public GameSimulator(int numberOfPlayers, int numberOfGamesPerPlayer, EntityManagerFactory emf) {
+    this.numberOfPlayers = numberOfPlayers;
+    this.numberOfGamesPerPlayer = numberOfGamesPerPlayer;
     this.entityManager = emf.createEntityManager();
+    this.catCon = new CategoryController();
   }
 
   public void runSimulation() {
-    EntityTransaction transaction = null;
-
-    catCon = new CategoryController();
-    catCon.load(entityManager);
-    categories = catCon.getHashSet();
 
     try {
       transaction = entityManager.getTransaction();
       transaction.begin();
 
+      this.catCon.load(entityManager);
+      this.gameCategories = catCon.getCategories();
+
       // Generates Players and several Games for each Player
-      for (int i = 0; i < this.countPlayer; i++) {
+      for (int i = 0; i < this.numberOfPlayers; i++) {
         Player player = createPlayer("player" + i);
-        System.out.println("Player "+i);
-        for (int j = 0; j < this.countGamesEach; j++) {
+        System.out.print("Player "+i);
+        for (int j = 0; j < this.numberOfGamesPerPlayer; j++) {
           int dayOfMonth = j % 31; //To have Games played on different days
-          Game game = createGame(player, dayOfMonth);
-          System.out.println("Game "+j);
+          createGame(player, dayOfMonth);
+          System.out.print("Game "+j);
         }
-        entityManager.flush();
-        entityManager.clear();
-        System.out.println("Flush and Clear!!");
+      }
+
+      for(Category cat : this.gameCategories){
+        entityManager.refresh(cat);
       }
 
       transaction.commit();
@@ -59,7 +63,7 @@ public class GameSimulator {
         transaction.rollback();
       }
 
-      throw new Error("Could not create new player.");
+      throw new Error("Transaction error!");
 
 
     }
@@ -68,12 +72,9 @@ public class GameSimulator {
   private Player createPlayer(String playerName) {
 
     Player newPlayer = new Player();
-    entityManager.persist(newPlayer);
-    System.out.println("Player created!");
-
+    universalPersist(newPlayer);
+    System.out.print("Player created!");
     newPlayer.setName(playerName);
-
-    this.countPersist++;
     return newPlayer;
   }
 
@@ -85,12 +86,10 @@ public class GameSimulator {
     // save game
 
     Game game = new Game();
-    entityManager.persist(game);
-    entityManager.persist(player);
-    System.out.println("Game created!");
+    universalPersist(game);
+    System.out.print("Game created!");
 
-    int maxQuestions = 5;
-    game.setMaxQuestions(maxQuestions);
+    game.setMaxQuestions(questionsPerGame);
 
     Date date = new Date();
     date.setDate(dayOfMonth);
@@ -100,14 +99,35 @@ public class GameSimulator {
     player.getGames().add(game);
     game.setPlayer(player);
 
-    /*
-    for (Category cat : catego) {
-      entityManager.persist(cat);
-      cat.getGames().add(game);
+    /*for(int i=0; i<gameCategories.size(); i++)
+    {
+      game.getCategories().addAll(gameCategories);
     }
-    game.getCategories().addAll(gameCategories);
     */
+
+    for(Category cat : gameCategories)
+    game.getCategories().addAll(gameCategories);
+
     return game;
+  }
+
+  private void universalPersist(Object o){
+    entityManager.persist(o);
+    persistCounter++;
+    persistCountTotal++;
+    System.out.print("\t"+persistCounter+"\t"+persistCountTotal+"\n");
+    if(this.persistCounter == 5000){
+      persistCounter = 0;
+      entityManager.flush();
+      entityManager.clear();
+      transaction.commit();
+      transaction.begin();
+      System.out.println("Flush and Clear!!");
+    }
+  }
+
+  private void testMassData(){
+
   }
 
 }
