@@ -17,7 +17,6 @@ public class GameSimulator {
   private int numberOfGamesPerPlayer;
   private int questionsPerGame = 8;
   private int persistCounter = 0;
-  private int persistCountTotal = 0;
   private EntityManager entityManager;
   EntityTransaction transaction;
 
@@ -43,20 +42,16 @@ public class GameSimulator {
       // Generates Players and several Games for each Player
       for (int i = 0; i < this.numberOfPlayers; i++) {
         Player player = createPlayer("player" + i);
-        System.out.print("Player "+i);
+        System.out.print("Player " + i);
         for (int j = 0; j < this.numberOfGamesPerPlayer; j++) {
           int dayOfMonth = j % 31; //To have Games played on different days
-          createGame(player, dayOfMonth);
-          System.out.print("Game "+j);
+          Game game = createGame(player, dayOfMonth);
+          System.out.print("Game " + j);
         }
       }
 
-      for(Category cat : this.gameCategories){
-        entityManager.refresh(cat);
-      }
 
       transaction.commit();
-
     } catch (RuntimeException e) {
       // Rollback changes
       if (transaction != null && transaction.isActive()) {
@@ -72,8 +67,7 @@ public class GameSimulator {
   private Player createPlayer(String playerName) {
 
     Player newPlayer = new Player();
-    universalPersist(newPlayer);
-    System.out.print("Player created!");
+    persist(newPlayer);
     newPlayer.setName(playerName);
     return newPlayer;
   }
@@ -86,8 +80,7 @@ public class GameSimulator {
     // save game
 
     Game game = new Game();
-    universalPersist(game);
-    System.out.print("Game created!");
+    persist(game);
 
     game.setMaxQuestions(questionsPerGame);
 
@@ -105,29 +98,27 @@ public class GameSimulator {
     }
     */
 
-    for(Category cat : gameCategories)
-    game.getCategories().addAll(gameCategories);
+    /*
+    for (Category cat : gameCategories) {
+      //entityManager.refresh(cat);
+      game.getCategories().addAll(gameCategories);
+    }*/
 
     return game;
   }
 
-  private void universalPersist(Object o){
-    entityManager.persist(o);
-    persistCounter++;
-    persistCountTotal++;
-    System.out.print("\t"+persistCounter+"\t"+persistCountTotal+"\n");
-    if(this.persistCounter == 5000){
+  private void testMassData() {
+
+  }
+
+  private void persist(Object o){
+    if(persistCounter == 5000){
       persistCounter = 0;
       entityManager.flush();
       entityManager.clear();
-      transaction.commit();
-      transaction.begin();
-      System.out.println("Flush and Clear!!");
     }
-  }
-
-  private void testMassData(){
-
+    entityManager.persist(o);
+    persistCounter++;
   }
 
 }
