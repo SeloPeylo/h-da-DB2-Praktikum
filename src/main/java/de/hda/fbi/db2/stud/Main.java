@@ -98,6 +98,8 @@ public class Main {
                 break;
 
             case 2: // Analyze Game data
+                GameSimulator gameSimulator = new GameSimulator(10000, 100, emf);
+                gameSimulator.runSimulation();
                 break;
         }
 
