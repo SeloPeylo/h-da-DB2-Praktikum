@@ -132,7 +132,9 @@ public class SimulationController {
         final int playerCount = this.countPlayer;
         final int gamesCount = this.countGamesEach;
         final int batchSize = this.batchSize;
-        final Long simulationName = new Date().getTime();
+        final Long timeStamp = new Date().getTime();
+        int nonce = random.nextInt(100);
+        final String simulationName = timeStamp  + "_" + nonce;
 
         // Get all Categories
         List<Category> allCategories = categoryController.getCategories();
@@ -152,7 +154,7 @@ public class SimulationController {
 
                 // create player
                 Player player = new Player();
-                player.setName("player" + simulationName + "_" + p);
+                player.setName("p" + simulationName + "_" + p);
 
                 //persist player
                 entityManager.persist(player);

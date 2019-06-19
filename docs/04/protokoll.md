@@ -1,7 +1,7 @@
 # Praktikum 4 - Praktikumsbericht 
 Datenbanken 2 - Sommersemester 2019  
 Gruppe: Fr2y-6
- | Selim Sinan
+750907 | Selim Sinan
 752940 | Ruben van Laack  
 
 
@@ -15,7 +15,7 @@ Danach wird in einem try-catch-block eine neue Transaktion gestartet.
 Nach dem öffnen der Transaktion werden in 3 ineinander verschachtelten For-Schleifen die Spieler, 
 die Spiele jedes Spielers, sowie die Antworten zu Fragen für jedes Spiel erzeugt. 
 Diese Objekte werden nach ihrer Erzeugung direkt dem Persistenzkontext hinzugefügt. 
-Nach jedem fünfzigsten Objekt im Persistenzkontext (einem Batch) wird ein "entityManager.flush()" und ein "entityManager.clear()" durchgeführt.
+Nach jedem 500sten Objekt im Persistenzkontext wird ein "entityManager.flush()" und ein "entityManager.clear()" durchgeführt.
 Um Bach-inserts zu ermöglichen / zu beschleunigen mussten die Einstellungen der "Sequences" für die Generierung der Entity-Ids leicht verändert werden.
 Es wird nun eine größe Anzahl an Ids von der Datenbank, bzw. von der "Sequence" geladen und für die Objekterstellung vorgehalten, 
 statt be jedem flush für jedes Objekt einzeln eine Id abzufragen.
@@ -38,7 +38,7 @@ das 4 Threads mit unabhängigen Datenbank-Sessions je 2.500 Spieler, mit je 100 
 
 * Wie lange dauert die Massendatengenerierung bei Ihrer Anwendung?
 > Leider läuft die Datenbank bei mir auf dem Tablet in einer Ubuntu-VM mit nur einem CPU Kern.
-> Daher lief es selbst mit den unten Aufgeführten Optimierungen ca. 20 - 22 Minuten.
+> Daher lief es selbst mit den unten Aufgeführten Optimierungen ca. 7 - 10 Minuten.
 
 * Wie haben Sie eine schnelle Erzeugung der Daten bewirkt?
 > * Konfiguration des Batch Writing mit in der persistance.xml sowie im Code mittels regelmäßigem Flush.
@@ -53,5 +53,5 @@ das 4 Threads mit unabhängigen Datenbank-Sessions je 2.500 Spieler, mit je 100 
 > * Je eine Transaktion pro Thread, also eine für die gesamte Erzeugung aller Objekte in einer Session.
 > * Da die Objekte sehr schnell erzeugt werden und der Commit einer Transaktion auch mit wenigen Objekten länger dauert.
 
-* Wie verwenden Sie flush(),clear(), etc. und warum?
+* Wie verwenden Sie flush(), clear(), etc. und warum?
 > * Je ein Flush und ein Clear für das Erstellen eines Batches und um Platz für das nächste Batch freizugeben.
