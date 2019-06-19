@@ -158,7 +158,6 @@ public class Main {
         } while (chosenOption != 4);
 
 
-
         // Close EMF
         md.close();
         emf.close();
