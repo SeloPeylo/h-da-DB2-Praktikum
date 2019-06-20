@@ -46,6 +46,17 @@ public class Category {
         games = new ArrayList<>();
     }
 
+    /*
+    // Copy constructor
+    public Category(Category cat) {
+        // no real copy, is the same entity anyway
+        this.id = cat.id;
+        this.name = cat.name;
+        this.questions = cat.questions;
+        this.games = cat.games;
+    }
+     */
+
     public Category(String name) {
         this.name = name;
         this.questions = new ArrayList<>();

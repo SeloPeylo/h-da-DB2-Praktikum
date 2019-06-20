@@ -70,8 +70,8 @@ public class Gameplay {
         System.out.println("Alle bekannten Kategorien: ");
         System.out.println("-----------------------------");
         HashMap<String, Category> categories = gameCon.getAllCategories();
-        for (Category cat : categories.values()){
-            System.out.println(cat.getName());
+        for (String name : categories.keySet()){
+            System.out.println(name);
         }
         System.out.println("-----------------------------");
 
@@ -83,8 +83,11 @@ public class Gameplay {
         for (String chosenCatName : chosenCategories){
             Category gameCategory = categories.get(chosenCatName);
 
-            if (gameCategory != null) {
+            try {
                 gameCategories.add(gameCategory);
+            } catch (NullPointerException e) {
+                // category can't be found in db
+                System.out.print("Kategory '" + chosenCatName + "' exisitiert nicht!");
             }
         }
         System.out.println(); // line break

@@ -222,13 +222,17 @@ public class Main {
             switch (chosenOption) {
                 default:
                     break;
-                case 1:
-                    // TODO(ruben): ask for parameter to be entered by the user
-                    System.out.println("Abfrage ...");
 
-                    // get players in date
-                    Date startdate = fromString("2019-06-16 16:55:03");
-                    Date enddate = fromString("2019-06-16 16:55:23");
+                case 1:
+                    // get players in date - Parameter
+                    System.out.print("Bitte Startdatum eingeben (z.B. '2019-06-16 16:55:03': ");
+                    String startDateInput = inputScanner.nextLine();
+                    System.out.print("Bitte Enddatum eingeben (z.B. '2019-06-16 16:55:23': ");
+                    String endDateInput = inputScanner.nextLine();
+                    Date startdate = fromString(startDateInput);
+                    Date enddate = fromString(endDateInput);
+
+                    System.out.println("Abfrage ...");
                     List<Player> players = anCon.playedBetween(startdate, enddate);
 
                     System.out.println("Ausgabe aller Spieler welche zwischen: " +
@@ -251,11 +255,11 @@ public class Main {
                     break;
 
                 case 2:
-                    // TODO(ruben): ask for parameter to be entered by the user
-                    System.out.println("Abfrage ...");
-
                     // get games of player x
-                    int playerId  = 1;
+                    System.out.print("Bitte Spieler-ID eingeben: ");
+                    int playerId  = inputScanner.nextInt();
+
+                    System.out.println("Abfrage ...");
                     List<GameEvaluation> gameEvaluations = anCon.gameResultsOfPlayer(playerId);
 
                     System.out.println("Ausgabe aller Spiele von Spieler mit ID "
@@ -271,9 +275,8 @@ public class Main {
                     break;
 
                 case 3:
-                    System.out.println("Abfrage ...");
-
                     // get cound of games for each player
+                    System.out.println("Abfrage ...");
                     List<Player> playerList = anCon.numberofGamesPerPlayer();
 
                     System.out.println("Ausgabe der " + playerList.size() +
@@ -290,14 +293,11 @@ public class Main {
                     break;
 
                 case 4:
-                    System.out.println("Abfrage ...");
-
                     // get cound of games for each player
+                    System.out.println("Abfrage ...");
                     Category cat = anCon.categorieUsage();
 
-                    System.out.println("Ausgabe der Kategorien, "
-                        + "nach Nutzung in Spielen absteigend sortiert: ");
-
+                    System.out.println("Ausgabe der meistgewählten Kategorie: ");
                     System.out.println(cat.info());
 
                     break;

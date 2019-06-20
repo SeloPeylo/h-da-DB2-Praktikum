@@ -121,6 +121,7 @@ public class GameController {
             game.setPlayer(player);
 
             // persist and add gameCategories
+
             for (Category cat : gameCategories){
                 entityManager.persist(cat);
                 cat.getGames().add(game);

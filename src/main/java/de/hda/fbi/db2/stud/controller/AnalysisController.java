@@ -98,6 +98,7 @@ public class AnalysisController {
     public List<Player> numberofGamesPerPlayer(){  // Practice 5 - JPQL Query 3
         entityManager.clear();  // make space for query
         List<Player> queryResults = null;
+        // TODO(ruben): use result class with start & enddate to reduce loading when printing
 
         try {
             // Get players query
