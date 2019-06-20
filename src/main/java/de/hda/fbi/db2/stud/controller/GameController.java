@@ -180,23 +180,27 @@ public class GameController {
             transaction.begin();
 
             // -- modify database here --
+            // TO DO(ruben): fix this!!
+            // TO DO(ruben): test if it works as expected??
+            //answerCorrect = SimulationController.addQuestionAnswer(game, question,
+            //    chosenAnswer, entityManager);
 
             // create & add to persist
-            QuestionAsked newQuestAnwer = new QuestionAsked();
-            entityManager.persist(newQuestAnwer);
+            QuestionAsked newQuestAnswer = new QuestionAsked();
+            entityManager.persist(newQuestAnswer);
 
             // modify
-            newQuestAnwer.setSelectedAnswer(chosenAnswer);
+            newQuestAnswer.setSelectedAnswer(chosenAnswer);
 
-            // - add question / bidirectional
-            entityManager.persist(question);
-            newQuestAnwer.setQuestion(question);
-            question.getAsked().add(newQuestAnwer);
+            // - add question
+            //entityManager.persist(question);  // removed for performace
+            newQuestAnswer.setQuestion(question);
+            //question.newQuestAnswer().add(newQuestAnswer);  // removed for performace
 
-            // - add game / bidirectional
-            entityManager.persist(game);
-            newQuestAnwer.setGame(game);
-            game.getAskesQuestions().add(newQuestAnwer);
+            // - add game
+            //entityManager.persist(game);  // removed for performace
+            newQuestAnswer.setGame(game);
+            //game.newQuestAnswer().add(newQuestAnswer);  // removed for performace
 
             // get return value
             answerCorrect = (question.getCorrectAnswer() == chosenAnswer);
@@ -218,12 +222,8 @@ public class GameController {
     }
 
     // non database methods
-    public static Question getRandomQuestion(Game game){
-        // get HashSet of used questions
-        HashSet<Integer> usedQuestionIds = new HashSet<>();
-        for (QuestionAsked qs : game.getAskesQuestions()){
-            usedQuestionIds.add(qs.getQuestion().getId());
-        }
+    public static Question getRandomQuestion(Game game, HashSet<Integer> usedQuestionIds){
+        // TODO(ruben): cache list and remove used question instead of crating list each time!
 
         // get list of all unused questions
         ArrayList<Question> unusedQuestions = new ArrayList<>();
@@ -237,9 +237,7 @@ public class GameController {
             }
         }
 
-        // -- Math.random() = rand ∈ (rand >= 0 && rand < 1)
-        // -- (rand * size) = randIndex ∈(randIndex >= 0 && randIndex < size)
-
+        // get question out of unused
         if (unusedQuestions.size() > 0){
             int randomQuestionIndex = (int) (Math.random() * unusedQuestions.size());
             Question randomQuestion = unusedQuestions.get(randomQuestionIndex);

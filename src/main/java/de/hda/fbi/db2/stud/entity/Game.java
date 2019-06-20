@@ -13,6 +13,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -24,11 +25,15 @@ import javax.persistence.UniqueConstraint;
 @Entity
 //@Table(name = "game")
 @Table(name = "game", schema = "master_data_knowledge_test")
+@SequenceGenerator(name = "master_data_knowledge_test.game_id_seq",
+    initialValue = 1, allocationSize = 1000000)
 public class Game {
 
     // Vars
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,
+        generator = "master_data_knowledge_test.game_id_seq")
     private int id;
 
     private Date startDatetime;
@@ -38,8 +43,8 @@ public class Game {
     @ManyToOne
     private Player player;
 
-    @OneToMany(targetEntity = QuestionAsked.class, mappedBy = "game")
-    private List<QuestionAsked> askesQuestions;
+    //@OneToMany(targetEntity = QuestionAsked.class, mappedBy = "game")
+    //private List<QuestionAsked> askesQuestions;
 
     //@ManyToMany(targetEntity = Category.class, mappedBy = "games")
     @ManyToMany
@@ -57,7 +62,7 @@ public class Game {
         this.endDatetime = null;
         maxQuestions = 0;
         player = null;
-        askesQuestions = new ArrayList<>();
+        //askesQuestions = new ArrayList<>();
         categories = new ArrayList<>();
     }
 
@@ -89,7 +94,7 @@ public class Game {
             ", endDatetime=" + endDatetime +
             ", maxQuestions=" + maxQuestions +
             ", player.getId()=" + player.getId() +
-            ", askesQuestions.size()=" + askesQuestions.size() +
+            //", askesQuestions.size()=" + askesQuestions.size() +
             ", categories=" + categories +
             '}';
     }
@@ -137,6 +142,7 @@ public class Game {
         this.player = player;
     }
 
+    /*
     public List<QuestionAsked> getAskesQuestions() {
         return askesQuestions;
     }
@@ -144,6 +150,7 @@ public class Game {
     public void setAskesQuestions(List<QuestionAsked> askesQuestions) {
         this.askesQuestions = askesQuestions;
     }
+    */
 
     public List<Category> getCategories() {
         return categories;

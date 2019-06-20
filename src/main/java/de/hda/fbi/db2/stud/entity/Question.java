@@ -25,6 +25,7 @@ public class Question {
     @Id
     private int id;
     private String questionText;
+    //TODO(ruben): fix typo answers1 -> answer1
     private String answers1;
     private String answers2;
     private String answers3;
@@ -34,13 +35,13 @@ public class Question {
     @ManyToOne
     private Category category;
 
-    @OneToMany(targetEntity = QuestionAsked.class, mappedBy = "question")
-    private List<QuestionAsked> asked;
+    //@OneToMany(targetEntity = QuestionAsked.class, mappedBy = "question")
+    //private List<QuestionAsked> asked;
 
 
     // Constructor
     public Question() {
-        asked = new ArrayList<>();
+        //asked = new ArrayList<>();
     }
 
     public Question(int id, String questionText, String answers1, String answers2, String answers3,
@@ -85,7 +86,7 @@ public class Question {
             ", answers4='" + answers4 + '\'' +
             ", correctAnswer=" + correctAnswer +
             ", category=" + category +
-            ", asked.size()=" + asked.size() +
+            //", asked.size()=" + asked.size() +
             '}';
     }
 
@@ -154,6 +155,7 @@ public class Question {
         this.category = category;
     }
 
+    /*
     public List<QuestionAsked> getAsked() {
         return asked;
     }
@@ -161,4 +163,5 @@ public class Question {
     public void setAsked(List<QuestionAsked> asked) {
         this.asked = asked;
     }
+    */
 }

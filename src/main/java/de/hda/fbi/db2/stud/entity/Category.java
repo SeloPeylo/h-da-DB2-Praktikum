@@ -80,6 +80,16 @@ public class Category {
             '}';
     }
 
+    // info = small toString without lists (less db calls)
+    public String info() {
+        return "Category{" +
+            "id=" + id + '\'' +
+            ", name='" + name + '\'' +
+            ", ..." +
+            '}';
+    }
+
+
     //Getter & Setter
     public int getId() {
         return id;

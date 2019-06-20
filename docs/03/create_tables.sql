@@ -26,16 +26,16 @@
 -- \DROP SEQUENCE master_data_knowledge_test.questionasked_id_seq;
 
 -- =================================================================================
--- Create Sequences & Tables (Sequences are automatically create with tables)
+-- Create Sequences & Tables (Sequences are automatically created with tables)
 -- =================================================================================
 
 -- Create Tables
-CREATE TABLE master_data_knowledge_test.category (ID  SERIAL NOT NULL, NAME VARCHAR(255) UNIQUE, PRIMARY KEY (ID));
-CREATE TABLE master_data_knowledge_test.game (ID  SERIAL NOT NULL, ENDDATETIME TIMESTAMP, MAXQUESTIONS INTEGER, STARTDATETIME TIMESTAMP, PLAYER_ID INTEGER, PRIMARY KEY (ID));
-CREATE TABLE master_data_knowledge_test.player (ID  SERIAL NOT NULL, NAME VARCHAR(255) UNIQUE, PRIMARY KEY (ID));
-CREATE TABLE master_data_knowledge_test.question (ID INTEGER NOT NULL, ANSWERS1 VARCHAR(255), ANSWERS2 VARCHAR(255), ANSWERS3 VARCHAR(255), ANSWERS4 VARCHAR(255), CORRECTANSWER INTEGER, QUESTIONTEXT VARCHAR(255), CATEGORY_ID INTEGER, PRIMARY KEY (ID));
-CREATE TABLE master_data_knowledge_test.questionasked (ID  SERIAL NOT NULL, SELECTEDANSWER INTEGER, GAME_ID INTEGER, QUESTION_ID INTEGER, PRIMARY KEY (ID));
-CREATE TABLE master_data_knowledge_test.game_category (categoryId INTEGER NOT NULL, gameId INTEGER NOT NULL, PRIMARY KEY (categoryId, gameId));
+CREATE TABLE master_data_knowledge_test.category (ID  SERIAL NOT NULL, NAME VARCHAR(255) UNIQUE, PRIMARY KEY (ID))
+CREATE TABLE master_data_knowledge_test.game (ID INTEGER NOT NULL, ENDDATETIME TIMESTAMP, MAXQUESTIONS INTEGER, STARTDATETIME TIMESTAMP, PLAYER_ID INTEGER, PRIMARY KEY (ID))
+CREATE TABLE master_data_knowledge_test.player (ID INTEGER NOT NULL, NAME VARCHAR(255) UNIQUE, PRIMARY KEY (ID))
+CREATE TABLE master_data_knowledge_test.question (ID INTEGER NOT NULL, ANSWERS1 VARCHAR(255), ANSWERS2 VARCHAR(255), ANSWERS3 VARCHAR(255), ANSWERS4 VARCHAR(255), CORRECTANSWER INTEGER, QUESTIONTEXT VARCHAR(255), CATEGORY_ID INTEGER, PRIMARY KEY (ID))
+CREATE TABLE master_data_knowledge_test.questionasked (ID INTEGER NOT NULL, SELECTEDANSWER INTEGER, GAME_ID INTEGER, QUESTION_ID INTEGER, PRIMARY KEY (ID))
+CREATE TABLE master_data_knowledge_test.game_category (categoryId INTEGER NOT NULL, gameId INTEGER NOT NULL, PRIMARY KEY (categoryId, gameId))
 
 -- Create Constrains
 ALTER TABLE master_data_knowledge_test.game_category ADD CONSTRAINT UNQ_game_category_0 UNIQUE (gameId, categoryId);
