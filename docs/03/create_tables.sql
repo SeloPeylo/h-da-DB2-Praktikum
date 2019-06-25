@@ -26,16 +26,16 @@
 -- \DROP SEQUENCE master_data_knowledge_test.questionasked_id_seq;
 
 -- =================================================================================
--- Create Sequences & Tables (Sequences are automatically created with tables)
+-- Create Sequences & Tables
 -- =================================================================================
 
 -- Create Tables
-CREATE TABLE master_data_knowledge_test.category (ID  SERIAL NOT NULL, NAME VARCHAR(255) UNIQUE, PRIMARY KEY (ID))
-CREATE TABLE master_data_knowledge_test.game (ID INTEGER NOT NULL, ENDDATETIME TIMESTAMP, MAXQUESTIONS INTEGER, STARTDATETIME TIMESTAMP, PLAYER_ID INTEGER, PRIMARY KEY (ID))
-CREATE TABLE master_data_knowledge_test.player (ID INTEGER NOT NULL, NAME VARCHAR(255) UNIQUE, PRIMARY KEY (ID))
-CREATE TABLE master_data_knowledge_test.question (ID INTEGER NOT NULL, ANSWERS1 VARCHAR(255), ANSWERS2 VARCHAR(255), ANSWERS3 VARCHAR(255), ANSWERS4 VARCHAR(255), CORRECTANSWER INTEGER, QUESTIONTEXT VARCHAR(255), CATEGORY_ID INTEGER, PRIMARY KEY (ID))
-CREATE TABLE master_data_knowledge_test.questionasked (ID INTEGER NOT NULL, SELECTEDANSWER INTEGER, GAME_ID INTEGER, QUESTION_ID INTEGER, PRIMARY KEY (ID))
-CREATE TABLE master_data_knowledge_test.game_category (categoryId INTEGER NOT NULL, gameId INTEGER NOT NULL, PRIMARY KEY (categoryId, gameId))
+CREATE TABLE master_data_knowledge_test.category (ID  SERIAL NOT NULL, NAME VARCHAR(255) UNIQUE, PRIMARY KEY (ID));
+CREATE TABLE master_data_knowledge_test.game (ID INTEGER NOT NULL, ENDDATETIME TIMESTAMP, MAXQUESTIONS INTEGER, STARTDATETIME TIMESTAMP, PLAYER_ID INTEGER, PRIMARY KEY (ID));
+CREATE TABLE master_data_knowledge_test.player (ID INTEGER NOT NULL, NAME VARCHAR(255) UNIQUE, PRIMARY KEY (ID));
+CREATE TABLE master_data_knowledge_test.question (ID INTEGER NOT NULL, ANSWERS1 VARCHAR(255), ANSWERS2 VARCHAR(255), ANSWERS3 VARCHAR(255), ANSWERS4 VARCHAR(255), CORRECTANSWER INTEGER, QUESTIONTEXT VARCHAR(255), CATEGORY_ID INTEGER, PRIMARY KEY (ID));
+CREATE TABLE master_data_knowledge_test.questionasked (ID INTEGER NOT NULL, SELECTEDANSWER INTEGER, GAME_ID INTEGER, QUESTION_ID INTEGER, PRIMARY KEY (ID));
+CREATE TABLE master_data_knowledge_test.game_category (categoryId INTEGER NOT NULL, gameId INTEGER NOT NULL, PRIMARY KEY (categoryId, gameId));
 
 -- Create Constrains
 ALTER TABLE master_data_knowledge_test.game_category ADD CONSTRAINT UNQ_game_category_0 UNIQUE (gameId, categoryId);
@@ -53,6 +53,18 @@ ALTER TABLE master_data_knowledge_test.player OWNER to jpauser;
 ALTER TABLE master_data_knowledge_test.question OWNER to jpauser;
 ALTER TABLE master_data_knowledge_test.questionasked OWNER to jpauser;
 ALTER TABLE master_data_knowledge_test.game_category OWNER to jpauser;
+
+-- Create Sequences
+-- \CREATE SEQUENCE master_data_knowledge_test.category_id_seq INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1; -- is automatically created with table
+CREATE SEQUENCE master_data_knowledge_test.player_id_seq INCREMENT BY 10000 START WITH 10000;
+CREATE SEQUENCE master_data_knowledge_test.questionasked_id_seq INCREMENT BY 1000000 START WITH 1000000;
+CREATE SEQUENCE master_data_knowledge_test.game_id_seq INCREMENT BY 1000000 START WITH 1000000;
+
+-- Alter owner of sequences
+ALTER SEQUENCE master_data_knowledge_test.category_id_seq OWNER TO jpauser;
+ALTER SEQUENCE master_data_knowledge_test.player_id_seq OWNER TO jpauser;
+ALTER SEQUENCE master_data_knowledge_test.questionasked_id_seq OWNER TO jpauser;
+ALTER SEQUENCE master_data_knowledge_test.game_id_seq OWNER TO jpauser;
 
 
 
