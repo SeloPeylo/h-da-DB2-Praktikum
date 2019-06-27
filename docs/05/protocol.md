@@ -29,6 +29,7 @@ In dem "Gather" Schritt werden daher parallel für jede Gruppe die Maxima der St
 Danach werden die einzelnen Gruppen, mit je einem Spieler und dessen aggregierten Spieldaten, über "Aggrigate" wieder anhand des Hash der Spieler-ID zusammengesetzt.
 Schlussendlich wird die Ergebnisstabelle noch mit einem Quicksort nach Datum absteigend sortiert.
 
+<div class="page"/><!-- Seitenumbruch -->
 
 ## Query 2
 ### EclipseLink SQL Query
@@ -49,7 +50,6 @@ Die resultierende Tabelle wird nun wieder, über Hash-Werte für den Fragen_ID F
 Im nächsten Schritt werden die Zeilen nach der Spiele-ID aufsteigend sortiert.
 Nun wird via "Aggregate" nach Spiele-ID Gruppiert und im "Gather Merge" werden die aggregierten Werte für jede Gruppe errechnet und die Gruppen zu je einer Zeile entsprechend dem Select zusammengefasst.
 Danach werden über ein weiteres "Aggregate" noch die Gruppen zu einer Tabelle zusammengebaut.
-<div class="page"/><!-- Seitenumbruch -->
 
 ## Query 3
 ### EclipseLink SQL Query
@@ -68,7 +68,6 @@ Danach werden über ein weiteres "Aggregate" noch die Gruppen zu einer Tabelle z
 - Zerteilung in Gruppen via "Aggregate" nach dem Spieler und Ermittlung der Spieleanzahl für jede Gruppe über "Gather".
 - Zusammenfassung der Gruppen über "Aggregate".
 - Absteigende Sortierung der Spieler nach der Anzahl an Spielen jedes Spielers in "Sort".
-<div class="page"/><!-- Seitenumbruch -->
 
 ## Query 4
 ### EclipseLink SQL Query
@@ -90,6 +89,7 @@ Danach werden über ein weiteres "Aggregate" noch die Gruppen zu einer Tabelle z
 - Über "Gather Merge" werden die Gruppen zu je einem Tupel (einer Spalte) verbunden.
 - Über "Aggregate" werden die Gruppen wieder zu einer Tabelle vereinigt und danach über "Sort" nach Anzahl der Spiele jeder Kategorie sortiert.
 
+<div class="page"/><!-- Seitenumbruch -->
 
 # Praktikum 5 - Aufgabe 3
 ## Indices
