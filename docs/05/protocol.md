@@ -181,6 +181,8 @@ Nachher:
 * Planning Time: 0.462 ms
 * Execution Time: 0.059 ms
 
+![Explain Analyse Query 4](./explains/explainanalyse_q2_newindices.jpg)
+
 ## Query 3 - Ausführungszeiten
 Vorher:  
 * Planning Time: 0.237 ms
